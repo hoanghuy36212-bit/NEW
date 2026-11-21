@@ -3,12 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>English 6-9 Quest - Smart Exam Compiler</title>
+    <title>English 6-9 Quest - Universal Exam Compiler</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <!-- Thư viện đọc file Word (.docx) trực tiếp trên trình duyệt -->
+    <!-- Đọc file Word (.docx) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    <!-- Đọc file PDF (.pdf) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <!-- Đọc chữ từ ảnh OCR (PNG, JPG, WEBP...) -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
         body { font-family: 'Nunito', sans-serif; background-color: #131f24; color: #e5e7eb; user-select: none; }
@@ -37,7 +41,7 @@
                 </div>
                 <div>
                     <h1 class="font-extrabold text-sm sm:text-base text-gray-200">English Quest</h1>
-                    <span class="text-xs text-emerald-400 font-bold">Auto Exam Compiler</span>
+                    <span class="text-xs text-emerald-400 font-bold">Universal Exam Compiler</span>
                 </div>
             </div>
 
@@ -82,7 +86,7 @@
                         <h2 class="text-lg font-bold text-white flex items-center gap-2">
                             <i class="fa-solid fa-map-location-dot text-emerald-400"></i> Bản Đồ Chinh Phục
                         </h2>
-                        <p class="text-xs text-gray-400">Chọn khối lớp hoặc tải lên file đề thi của riêng bạn</p>
+                        <p class="text-xs text-gray-400">Chọn khối lớp hoặc tải lên file đề thi định dạng bất kỳ</p>
                     </div>
                     <div class="flex flex-wrap gap-1.5 bg-gray-900/60 p-1.5 rounded-xl border border-gray-700 justify-center">
                         <button onclick="switchGrade(6)" id="btn-grade-6" class="px-3 py-1 text-xs font-bold rounded-lg bg-gray-800 text-gray-300 transition">Lớp 6</button>
@@ -101,7 +105,7 @@
                         <button onclick="filterSemester(2)" id="btn-sem-2" class="px-3 py-1.5 text-xs font-bold rounded-xl bg-gray-700 text-gray-300 transition">Học kỳ II</button>
                     </div>
                     <button onclick="switchTab('upload')" class="btn-duolingo bg-purple-600 hover:bg-purple-500 text-white px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5">
-                        <i class="fa-solid fa-cloud-arrow-up"></i> Upload & Biên Dịch Đề
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Upload Mọi Định Dạng
                     </button>
                 </div>
             </div>
@@ -109,39 +113,38 @@
             <div id="view-map" class="space-y-6"></div>
         </div>
 
-        <!-- AUTO EXAM COMPILER VIEW -->
+        <!-- UNIVERSAL AUTO EXAM COMPILER VIEW -->
         <div id="view-upload" class="hidden space-y-6">
             <div class="bg-[#202f36] p-6 rounded-2xl border border-gray-800 space-y-5">
                 <div>
                     <h2 class="text-xl font-black text-white flex items-center gap-2">
-                        <i class="fa-solid fa-microchip text-purple-400"></i> Trình Biên Dịch Đề Thi Tự Động
+                        <i class="fa-solid fa-microchip text-purple-400"></i> Trình Biên Dịch Đề Mọi Định Dạng
                     </h2>
                     <p class="text-xs text-gray-400 mt-1">
-                        Chỉ cần tải lên file Word (<code class="text-emerald-400">.docx</code>), file văn bản (<code class="text-emerald-400">.txt</code>) hoặc dán nguyên văn đề thi vào ô bên dưới. Hệ thống sẽ tự phân tích câu hỏi, đáp án A/B/C/D, bảng đáp án cuối đề và tạo bài học ngay!
+                        Nhận mọi loại file (<code class="text-emerald-400">.docx</code>, <code class="text-emerald-400">.pdf</code>, <code class="text-emerald-400">.txt</code>, <code class="text-emerald-400">.csv</code>, <code class="text-emerald-400">.json</code>, <code class="text-emerald-400">.md</code>, ảnh chụp đề <code class="text-emerald-400">.png/.jpg</code>, v.v.) hoặc dán trực tiếp nội dung. Hệ thống tự bóc tách và dựng bài học ngay!
                     </p>
                 </div>
 
-                <!-- Vùng kéo thả / chọn file -->
                 <label for="exam-file-input" class="block border-2 border-dashed border-purple-500/60 hover:border-purple-400 bg-purple-950/20 hover:bg-purple-900/20 rounded-2xl p-6 text-center cursor-pointer transition">
                     <div class="w-14 h-14 bg-purple-600/30 text-purple-400 rounded-full mx-auto flex items-center justify-center text-2xl mb-3">
-                        <i class="fa-solid fa-file-arrow-up"></i>
+                        <i class="fa-solid fa-file-import"></i>
                     </div>
-                    <p class="font-extrabold text-white text-sm">Bấm vào đây để chọn file đề (.docx hoặc .txt)</p>
-                    <p id="uploaded-file-name" class="text-xs text-gray-400 mt-1">Hỗ trợ đề trắc nghiệm Tiếng Anh có sẵn dạng A. B. C. D.</p>
-                    <input type="file" id="exam-file-input" accept=".txt,.docx" class="hidden" onchange="handleAutoExamFile(event)">
+                    <p class="font-extrabold text-white text-sm">Bấm vào đây để chọn file đề ở dạng nào cũng được</p>
+                    <p id="uploaded-file-name" class="text-xs text-gray-400 mt-1">Hỗ trợ mọi phần mở rộng file & ảnh chụp đề thi</p>
+                    <input type="file" id="exam-file-input" accept="*" class="hidden" onchange="handleUniversalFileUpload(event)">
                 </label>
 
                 <div class="space-y-3">
                     <div class="flex justify-between items-center">
                         <label class="text-xs font-bold text-gray-300">Tên đề / Bài học:</label>
                         <button onclick="loadDemoRawExam()" class="text-xs text-purple-400 hover:underline font-bold">
-                            <i class="fa-solid fa-flask"></i> Nạp thử 1 đề mẫu để test biên dịch
+                            <i class="fa-solid fa-flask"></i> Nạp thử 1 đề mẫu
                         </button>
                     </div>
                     <input type="text" id="exam-title-input" placeholder="Tự động lấy theo tên file hoặc nhập tên đề..." class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:border-purple-500 focus:outline-none">
 
-                    <label class="block text-xs font-bold text-gray-300 pt-1">Nội dung đề thô (Hệ thống tự đọc từ file hoặc bạn dán trực tiếp vào đây):</label>
-                    <textarea id="raw-exam-textarea" rows="10" placeholder="Dán nguyên văn đề thi vào đây... Ví dụ:&#10;Câu 1: She _____ to school every day.&#10;A. go&#10;B. *goes&#10;C. going&#10;D. went&#10;&#10;Câu 2: My brother is very _____ and helpful.&#10;A. kind&#10;B. lazily&#10;C. slow&#10;D. noise&#10;&#10;Đáp án: 1.B 2.A" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3.5 text-xs sm:text-sm text-gray-200 focus:border-purple-500 focus:outline-none font-mono leading-relaxed"></textarea>
+                    <label class="block text-xs font-bold text-gray-300 pt-1">Nội dung đề đã trích xuất (có thể chỉnh sửa thêm nếu cần):</label>
+                    <textarea id="raw-exam-textarea" rows="10" placeholder="Chọn file bất kỳ ở trên hoặc dán nội dung đề thi vào đây..." class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3.5 text-xs sm:text-sm text-gray-200 focus:border-purple-500 focus:outline-none font-mono leading-relaxed"></textarea>
                 </div>
 
                 <div id="compiler-status" class="hidden bg-gray-900/90 border border-emerald-500/40 rounded-xl p-3.5 text-xs text-emerald-300 space-y-1"></div>
@@ -253,7 +256,7 @@
                 <span class="text-xs font-bold mt-1">Bản đồ</span>
             </button>
             <button onclick="switchTab('upload')" id="nav-upload" class="flex flex-col items-center text-gray-400 hover:text-gray-200 transition">
-                <i class="fa-solid fa-file-arrow-up text-xl"></i>
+                <i class="fa-solid fa-file-import text-xl"></i>
                 <span class="text-xs font-bold mt-1">Upload Đề</span>
             </button>
             <button onclick="switchTab('shop')" id="nav-shop" class="flex flex-col items-center text-gray-400 hover:text-gray-200 transition">
@@ -272,6 +275,10 @@
     </nav>
 
     <script>
+        if (window.pdfjsLib) {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        }
+
         // --- DỮ LIỆU SGK GLOBAL SUCCESS ---
         const generateUnits = (gradeName, titles) => {
             return titles.map((titleData, i) => ({
@@ -339,7 +346,7 @@
         const dataGrade8 = generateUnits("Lớp 8", titles8);
         const dataGrade9 = generateUnits("Lớp 9", titles9);
 
-        let gameState = JSON.parse(localStorage.getItem('english69_compiler_v1')) || {
+        let gameState = JSON.parse(localStorage.getItem('english69_universal_v1')) || {
             currentGrade: 9, level: 1, xp: 0, streak: 1, coins: 60, hearts: 10, maxHearts: 10, shield: false,
             completedUnits: { 6: [], 7: [], 8: [], 9: [], custom: [] },
             customUnits: [],
@@ -347,7 +354,7 @@
         };
 
         function saveState() {
-            localStorage.setItem('english69_compiler_v1', JSON.stringify(gameState));
+            localStorage.setItem('english69_universal_v1', JSON.stringify(gameState));
             updateHUD();
         }
 
@@ -374,44 +381,63 @@
         }
 
         // =========================================================================
-        // TRÌNH BIÊN DỊCH ĐỀ THI TỰ ĐỘNG (SMART EXAM COMPILER)
+        // NHẬN MỌI ĐỊNH DẠNG FILE & BIÊN DỊCH TỰ ĐỘNG
         // =========================================================================
-
-        // 1. Đọc file .txt hoặc .docx khi người dùng upload
-        function handleAutoExamFile(event) {
+        async function handleUniversalFileUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
 
-            document.getElementById('uploaded-file-name').innerHTML = `<span class="text-emerald-400 font-bold">📄 Đã chọn: ${file.name}</span>`;
-            const cleanTitle = file.name.replace(/\.[^/.]+$/, "");
+            const nameLower = file.name.toLowerCase();
+            const typeLower = (file.type || '').toLowerCase();
+            document.getElementById('uploaded-file-name').innerHTML = `<span class="text-emerald-400 font-bold">📄 Đang xử lý: ${file.name}</span>`;
             if (!document.getElementById('exam-title-input').value.trim()) {
-                document.getElementById('exam-title-input').value = cleanTitle;
+                document.getElementById('exam-title-input').value = file.name.replace(/\.[^/.]+$/, "");
             }
 
-            if (file.name.toLowerCase().endsWith('.docx')) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    mammoth.extractRawText({ arrayBuffer: e.target.result })
-                        .then(result => {
-                            document.getElementById('raw-exam-textarea').value = result.value;
-                            showCompilerPreview(result.value);
-                        })
-                        .catch(err => alert("Không đọc được file Word này: " + err.message));
-                };
-                reader.readAsArrayBuffer(file);
-            } else {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('raw-exam-textarea').value = e.target.result;
-                    showCompilerPreview(e.target.result);
-                };
-                reader.readAsText(file);
+            try {
+                let extractedText = "";
+
+                if (nameLower.endsWith('.docx')) {
+                    const arrayBuffer = await file.arrayBuffer();
+                    const res = await mammoth.extractRawText({ arrayBuffer });
+                    extractedText = res.value;
+                } else if (nameLower.endsWith('.pdf') || typeLower.includes('pdf')) {
+                    const arrayBuffer = await file.arrayBuffer();
+                    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                    const pageTexts = [];
+                    for (let p = 1; p <= pdf.numPages; p++) {
+                        const page = await pdf.getPage(p);
+                        const tc = await page.getTextContent();
+                        pageTexts.push(tc.items.map(item => item.str).join(' '));
+                    }
+                    extractedText = pageTexts.join('\n\n');
+                } else if (typeLower.startsWith('image/') || /\.(png|jpe?g|webp|bmp|gif|tiff?)$/i.test(nameLower)) {
+                    const statusBox = document.getElementById('compiler-status');
+                    statusBox.classList.remove('hidden');
+                    statusBox.innerHTML = `<p class="font-bold text-purple-300"><i class="fa-solid fa-spinner fa-spin"></i> Đang nhận diện chữ từ ảnh...</p>`;
+                    const workerResult = await Tesseract.recognize(file, 'eng+vie');
+                    extractedText = workerResult.data.text || "";
+                } else {
+                    // Mọi định dạng file khác (.txt, .csv, .md, .json, .html, .xml, .log, file không đuôi...)
+                    const raw = await file.text();
+                    // Lọc ký tự điều khiển nhị phân nếu lỡ mở file nhị phân lạ
+                    extractedText = raw.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\uFFFD]/g, ' ').replace(/\s{3,}/g, '\n');
+                }
+
+                document.getElementById('uploaded-file-name').innerHTML = `<span class="text-emerald-400 font-bold">✅ Đã đọc xong: ${file.name}</span>`;
+                document.getElementById('raw-exam-textarea').value = extractedText.trim();
+                showCompilerPreview(extractedText);
+            } catch (err) {
+                document.getElementById('uploaded-file-name').innerHTML = `<span class="text-amber-400">⚠️ Đọc thô: ${file.name}</span>`;
+                const fallbackText = await file.text().catch(() => "");
+                document.getElementById('raw-exam-textarea').value = fallbackText;
+                if (fallbackText) showCompilerPreview(fallbackText);
+                else alert("Không đọc được file này: " + err.message);
             }
         }
 
-        // Nạp thử đề thô để người dùng kiểm tra
         function loadDemoRawExam() {
-            document.getElementById('exam-title-input').value = "Đề Kiểm Tra 15 Phút Tiếng Anh 9 - Global Success";
+            document.getElementById('exam-title-input').value = "Đề Kiểm Tra Tiếng Anh 9 - Global Success";
             const sample = `Câu 1: The artisans in my village usually _____ baskets from bamboo.
 A. weave
 B. cast
@@ -447,15 +473,12 @@ D. more large
             showCompilerPreview(sample);
         }
 
-        // Bộ phân tích cú pháp đề tự động (tách câu hỏi, A/B/C/D, bảng đáp án cuối đề, từ vựng, câu ghép)
         function parseRawExamText(rawText) {
             const lines = rawText.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
             
-            // Bước 1: Quét bảng đáp án ở cuối đề (nếu có dạng: 1.A 2.B hoặc 1-A, 2-C hoặc 1: B)
             const answerKeyMap = {};
             const answerKeyRegex = /\b(\d{1,3})\s*[\.\-\:\)]\s*([A-D])\b/gi;
             lines.forEach(line => {
-                // Nếu dòng chứa nhiều cặp số-chữ cái (ví dụ: 1.A 2.B 3.C) hoặc bắt đầu bằng "Đáp án" / "Key"
                 const matches = [...line.matchAll(answerKeyRegex)];
                 if (matches.length >= 2 || /^(đáp án|answer|key)/i.test(line)) {
                     matches.forEach(m => {
@@ -464,7 +487,6 @@ D. more large
                 }
             });
 
-            // Bước 2: Tách các câu hỏi trắc nghiệm và 4 đáp án A, B, C, D
             const quizList = [];
             const vocabMap = new Map();
             const sentenceList = [];
@@ -474,17 +496,15 @@ D. more large
 
             const pushCurrentQuestion = () => {
                 if (currentQ && currentQ.options.length >= 2) {
-                    // Xác định đáp án đúng nếu chưa được đánh dấu *
                     if (!currentQ.correctText) {
                         const keyLetter = answerKeyMap[currentQ.number];
                         if (keyLetter) {
-                            const letterIdx = keyLetter.charCodeAt(0) - 65; // A->0, B->1, C->2, D->3
+                            const letterIdx = keyLetter.charCodeAt(0) - 65;
                             if (currentQ.options[letterIdx]) {
                                 currentQ.correctText = currentQ.options[letterIdx];
                             }
                         }
                     }
-                    // Fallback nếu đề không ghi đáp án nào
                     if (!currentQ.correctText) {
                         currentQ.correctText = currentQ.options[0];
                     }
@@ -495,7 +515,6 @@ D. more large
                         correctText: currentQ.correctText
                     });
 
-                    // Tự động trích xuất từ vựng từ đáp án đúng (nếu là từ đơn/cụm từ ngắn)
                     const cleanAns = currentQ.correctText.replace(/[^a-zA-Z\s-]/g, '').trim();
                     if (cleanAns && cleanAns.split(/\s+/).length <= 3 && cleanAns.length >= 3) {
                         vocabMap.set(cleanAns.toLowerCase(), {
@@ -506,7 +525,6 @@ D. more large
                         });
                     }
 
-                    // Tự động tạo câu hoàn chỉnh cho game Ghép Câu bằng cách điền đáp án đúng vào chỗ trống
                     if (/_{2,}/.test(currentQ.q)) {
                         const completedSentence = currentQ.q
                             .replace(/^(Câu|Question)\s*\d+\s*[\.\:\)]\s*/i, '')
@@ -524,14 +542,11 @@ D. more large
             };
 
             lines.forEach(line => {
-                // Bỏ qua dòng bảng đáp án cuối trang
                 if (/^(đáp án|answer|key)\b/i.test(line) && [...line.matchAll(answerKeyRegex)].length >= 1) {
                     return;
                 }
 
-                // Kiểm tra dòng bắt đầu câu hỏi mới: "Câu 1:", "Question 1.", "1.", "1)"
                 const qStartMatch = line.match(/^(?:Câu|Question|Bài)?\s*(\d{1,3})\s*[\.\:\)]\s*(.+)/i);
-                // Kiểm tra dòng chứa các phương án A. B. C. D.
                 const inlineOptionsMatch = line.match(/(?:^|\s)(\*?[A-D])\s*[\.\)\:]\s*/g);
 
                 if (qStartMatch && !/^[A-D][\.\)]/i.test(line)) {
@@ -544,7 +559,6 @@ D. more large
                         correctText: ""
                     };
                 } else if (currentQ && inlineOptionsMatch && inlineOptionsMatch.length >= 1) {
-                    // Tách trường hợp 4 đáp án nằm trên cùng 1 dòng (VD: "A. go   B. goes   C. going   D. went") hoặc mỗi đáp án 1 dòng
                     const parts = line.split(/(?=(?:^|\s)\*?[A-D]\s*[\.\)\:]\s*)/).map(p => p.trim()).filter(p => p);
                     parts.forEach(part => {
                         const optMatch = part.match(/^(\*?)([A-D])\s*[\.\)\:]\s*(.+)/i);
@@ -562,14 +576,12 @@ D. more large
                         }
                     });
                 } else if (currentQ && currentQ.options.length === 0) {
-                    // Nối tiếp phần đề bài nếu câu hỏi xuống dòng
                     currentQ.q += " " + line;
                 }
             });
 
             pushCurrentQuestion();
 
-            // Đảm bảo luôn có dữ liệu tối thiểu cho cả 4 chặng
             const vocabList = Array.from(vocabMap.values());
             if (vocabList.length === 0) {
                 vocabList.push({ en: "vocabulary", vi: "từ vựng trọng tâm", phonetic: "/vəˈkæbjələri/", example: "Review your exam vocabulary." });
@@ -586,8 +598,8 @@ D. more large
             const statusBox = document.getElementById('compiler-status');
             statusBox.classList.remove('hidden');
             statusBox.innerHTML = `
-                <p class="font-bold text-white"><i class="fa-solid fa-check-circle text-emerald-400"></i> Đã nhận diện cấu trúc đề:</p>
-                <p>• Trích xuất được <b>${parsed.quizList.length}</b> câu hỏi trắc nghiệm (tự động khớp đáp án).</p>
+                <p class="font-bold text-white"><i class="fa-solid fa-check-circle text-emerald-400"></i> Đã biên dịch cấu trúc đề:</p>
+                <p>• Trích xuất được <b>${parsed.quizList.length}</b> câu hỏi trắc nghiệm.</p>
                 <p>• Tự động tạo <b>${parsed.vocabList.length}</b> thẻ từ vựng & <b>${parsed.sentenceList.length}</b> câu luyện ghép câu.</p>
             `;
         }
@@ -629,7 +641,6 @@ D. more large
 
             switchTab('map');
             switchGrade('custom');
-            // Mở thẳng vào Chặng 2 (Làm đề trắc nghiệm vừa biên dịch) để người dùng làm bài ngay
             startStage(newId, 2);
         }
 
@@ -699,10 +710,10 @@ D. more large
                 mapContainer.innerHTML = `
                     <div class="game-card p-8 text-center space-y-4">
                         <div class="w-16 h-16 bg-purple-500/20 text-purple-400 rounded-full mx-auto flex items-center justify-center text-3xl">
-                            <i class="fa-solid fa-file-arrow-up"></i>
+                            <i class="fa-solid fa-file-import"></i>
                         </div>
                         <h3 class="text-lg font-black text-white">Chưa có đề nào được biên dịch</h3>
-                        <p class="text-xs text-gray-400 max-w-md mx-auto">Tải lên file Word (.docx), file văn bản (.txt) hoặc dán đề thi của bạn để hệ thống tự động biên dịch thành bài học và đề thi tương tác!</p>
+                        <p class="text-xs text-gray-400 max-w-md mx-auto">Tải lên file đề ở dạng nào cũng được hoặc dán nội dung để hệ thống tự động biên dịch và tạo bài học làm ngay!</p>
                         <button onclick="switchTab('upload')" class="btn-duolingo bg-purple-600 hover:bg-purple-500 text-white font-bold px-6 py-3 rounded-xl text-sm">
                             <i class="fa-solid fa-cloud-arrow-up"></i> Upload & Biên Dịch Đề Ngay
                         </button>
@@ -851,7 +862,6 @@ D. more large
             const units = getUnitsByGrade(gameState.currentGrade);
             currentUnitObj = units.find(u => u.id === unitId);
             currentStageIdx = stageNum;
-            // Nếu là đề tự biên dịch vào Chặng 2 (Làm đề), vào thẳng câu hỏi 1 luôn cho nhanh
             lessonStep = (gameState.currentGrade === 'custom' && stageNum === 2) ? 1 : 0;
             heartsLostInThisLesson = 0;
             document.getElementById('lesson-modal').classList.remove('hidden');
