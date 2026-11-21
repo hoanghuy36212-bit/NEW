@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>English 6-9 Quest - Global Success & Custom AI</title>
+    <title>English 6-9 Quest - Smart Exam Compiler</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Thư viện đọc file Word (.docx) trực tiếp trên trình duyệt -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
         body { font-family: 'Nunito', sans-serif; background-color: #131f24; color: #e5e7eb; user-select: none; }
@@ -35,7 +37,7 @@
                 </div>
                 <div>
                     <h1 class="font-extrabold text-sm sm:text-base text-gray-200">English Quest</h1>
-                    <span class="text-xs text-emerald-400 font-bold">Global Success + Custom</span>
+                    <span class="text-xs text-emerald-400 font-bold">Auto Exam Compiler</span>
                 </div>
             </div>
 
@@ -74,14 +76,13 @@
         
         <!-- MAP VIEW -->
         <div id="view-map-wrapper">
-            <!-- CHỌN KHỐI LỚP & HỌC KỲ -->
             <div class="bg-[#202f36] p-4 rounded-2xl border border-gray-800 mb-6 space-y-3">
                 <div class="flex flex-col sm:flex-row justify-between items-center gap-3">
                     <div>
                         <h2 class="text-lg font-bold text-white flex items-center gap-2">
                             <i class="fa-solid fa-map-location-dot text-emerald-400"></i> Bản Đồ Chinh Phục
                         </h2>
-                        <p class="text-xs text-gray-400">Hoàn thành đủ 4 chặng để mở khóa Unit tiếp theo</p>
+                        <p class="text-xs text-gray-400">Chọn khối lớp hoặc tải lên file đề thi của riêng bạn</p>
                     </div>
                     <div class="flex flex-wrap gap-1.5 bg-gray-900/60 p-1.5 rounded-xl border border-gray-700 justify-center">
                         <button onclick="switchGrade(6)" id="btn-grade-6" class="px-3 py-1 text-xs font-bold rounded-lg bg-gray-800 text-gray-300 transition">Lớp 6</button>
@@ -89,7 +90,7 @@
                         <button onclick="switchGrade(8)" id="btn-grade-8" class="px-3 py-1 text-xs font-bold rounded-lg bg-gray-800 text-gray-300 transition">Lớp 8</button>
                         <button onclick="switchGrade(9)" id="btn-grade-9" class="px-3 py-1 text-xs font-bold rounded-lg bg-emerald-600 text-white transition">Lớp 9</button>
                         <button onclick="switchGrade('custom')" id="btn-grade-custom" class="px-3 py-1 text-xs font-bold rounded-lg bg-purple-700 text-white transition flex items-center gap-1">
-                            <i class="fa-solid fa-wand-magic-sparkles"></i> Đề Của Tôi
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> Đề Đã Biên Dịch
                         </button>
                     </div>
                 </div>
@@ -99,8 +100,8 @@
                         <button onclick="filterSemester(1)" id="btn-sem-1" class="px-3 py-1.5 text-xs font-bold rounded-xl bg-emerald-600 text-white transition">Học kỳ I</button>
                         <button onclick="filterSemester(2)" id="btn-sem-2" class="px-3 py-1.5 text-xs font-bold rounded-xl bg-gray-700 text-gray-300 transition">Học kỳ II</button>
                     </div>
-                    <button onclick="switchTab('upload')" class="text-xs font-bold text-purple-400 hover:text-purple-300 flex items-center gap-1">
-                        <i class="fa-solid fa-plus-circle"></i> Tạo bài từ đề riêng
+                    <button onclick="switchTab('upload')" class="btn-duolingo bg-purple-600 hover:bg-purple-500 text-white px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Upload & Biên Dịch Đề
                     </button>
                 </div>
             </div>
@@ -108,58 +109,46 @@
             <div id="view-map" class="space-y-6"></div>
         </div>
 
-        <!-- UPLOAD / CUSTOM LESSON CREATOR VIEW -->
+        <!-- AUTO EXAM COMPILER VIEW -->
         <div id="view-upload" class="hidden space-y-6">
-            <div class="bg-[#202f36] p-6 rounded-2xl border border-gray-800 space-y-4">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h2 class="text-xl font-black text-white flex items-center gap-2">
-                            <i class="fa-solid fa-file-arrow-up text-purple-400"></i> Tạo Bài Học Từ Đề Của Bạn
-                        </h2>
-                        <p class="text-xs text-gray-400 mt-1">Tải lên file đề (.txt) hoặc dán nội dung bên dưới để hệ thống tự động tạo game 4 chặng.</p>
-                    </div>
-                    <label class="cursor-pointer btn-duolingo bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold px-4 py-2.5 rounded-xl flex items-center gap-2">
-                        <i class="fa-solid fa-folder-open"></i> Chọn File (.txt)
-                        <input type="file" id="file-upload-input" accept=".txt" class="hidden" onchange="handleFileUpload(event)">
-                    </label>
+            <div class="bg-[#202f36] p-6 rounded-2xl border border-gray-800 space-y-5">
+                <div>
+                    <h2 class="text-xl font-black text-white flex items-center gap-2">
+                        <i class="fa-solid fa-microchip text-purple-400"></i> Trình Biên Dịch Đề Thi Tự Động
+                    </h2>
+                    <p class="text-xs text-gray-400 mt-1">
+                        Chỉ cần tải lên file Word (<code class="text-emerald-400">.docx</code>), file văn bản (<code class="text-emerald-400">.txt</code>) hoặc dán nguyên văn đề thi vào ô bên dưới. Hệ thống sẽ tự phân tích câu hỏi, đáp án A/B/C/D, bảng đáp án cuối đề và tạo bài học ngay!
+                    </p>
                 </div>
 
-                <div class="space-y-4 pt-2">
-                    <div>
-                        <label class="block text-xs font-bold text-gray-300 mb-1">1. Tên bài học / Đề thi:</label>
-                        <input type="text" id="custom-title" placeholder="Ví dụ: Đề ôn thi giữa kỳ 1 - Tiếng Anh 9" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:border-emerald-500 focus:outline-none">
+                <!-- Vùng kéo thả / chọn file -->
+                <label for="exam-file-input" class="block border-2 border-dashed border-purple-500/60 hover:border-purple-400 bg-purple-950/20 hover:bg-purple-900/20 rounded-2xl p-6 text-center cursor-pointer transition">
+                    <div class="w-14 h-14 bg-purple-600/30 text-purple-400 rounded-full mx-auto flex items-center justify-center text-2xl mb-3">
+                        <i class="fa-solid fa-file-arrow-up"></i>
                     </div>
+                    <p class="font-extrabold text-white text-sm">Bấm vào đây để chọn file đề (.docx hoặc .txt)</p>
+                    <p id="uploaded-file-name" class="text-xs text-gray-400 mt-1">Hỗ trợ đề trắc nghiệm Tiếng Anh có sẵn dạng A. B. C. D.</p>
+                    <input type="file" id="exam-file-input" accept=".txt,.docx" class="hidden" onchange="handleAutoExamFile(event)">
+                </label>
 
-                    <div>
-                        <label class="block text-xs font-bold text-gray-300 mb-1">
-                            2. Danh sách Từ Vựng (Mỗi dòng 1 từ theo mẫu: <span class="text-emerald-400">từ tiếng Anh - nghĩa tiếng Việt</span>):
-                        </label>
-                        <textarea id="custom-vocab" rows="4" placeholder="environment - môi trường&#10;pollution - sự ô nhiễm&#10;protect - bảo vệ&#10;recycle - tái chế" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-sm text-white focus:border-emerald-500 focus:outline-none font-mono"></textarea>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold text-gray-300 mb-1">
-                            3. Câu hỏi Trắc Nghiệm (Mỗi câu cách nhau 1 dòng trống, thêm dấu <span class="text-yellow-400">*</span> trước đáp án đúng):
-                        </label>
-                        <textarea id="custom-quiz" rows="7" placeholder="She _____ to school every day.&#10;go&#10;*goes&#10;going&#10;is go&#10;&#10;They _____ football at the moment.&#10;play&#10;played&#10;*are playing&#10;plays" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-sm text-white focus:border-emerald-500 focus:outline-none font-mono"></textarea>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold text-gray-300 mb-1">
-                            4. Câu hoàn chỉnh cho game Ghép Câu (Mỗi dòng 1 câu tiếng Anh chuẩn):
-                        </label>
-                        <textarea id="custom-sentences" rows="3" placeholder="We should protect our environment.&#10;Students are studying English now." class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-sm text-white focus:border-emerald-500 focus:outline-none font-mono"></textarea>
-                    </div>
-
-                    <div class="flex gap-3 pt-2">
-                        <button onclick="fillSampleCustomData()" class="px-4 py-3 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold text-xs transition">
-                            Điền dữ liệu mẫu
-                        </button>
-                        <button onclick="createCustomUnit()" class="flex-1 btn-duolingo bg-emerald-600 hover:bg-emerald-500 text-white font-black py-3 rounded-xl text-base flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-wand-magic-sparkles"></i> Tạo Bài Học Mới Ngay 🚀
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <label class="text-xs font-bold text-gray-300">Tên đề / Bài học:</label>
+                        <button onclick="loadDemoRawExam()" class="text-xs text-purple-400 hover:underline font-bold">
+                            <i class="fa-solid fa-flask"></i> Nạp thử 1 đề mẫu để test biên dịch
                         </button>
                     </div>
+                    <input type="text" id="exam-title-input" placeholder="Tự động lấy theo tên file hoặc nhập tên đề..." class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:border-purple-500 focus:outline-none">
+
+                    <label class="block text-xs font-bold text-gray-300 pt-1">Nội dung đề thô (Hệ thống tự đọc từ file hoặc bạn dán trực tiếp vào đây):</label>
+                    <textarea id="raw-exam-textarea" rows="10" placeholder="Dán nguyên văn đề thi vào đây... Ví dụ:&#10;Câu 1: She _____ to school every day.&#10;A. go&#10;B. *goes&#10;C. going&#10;D. went&#10;&#10;Câu 2: My brother is very _____ and helpful.&#10;A. kind&#10;B. lazily&#10;C. slow&#10;D. noise&#10;&#10;Đáp án: 1.B 2.A" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3.5 text-xs sm:text-sm text-gray-200 focus:border-purple-500 focus:outline-none font-mono leading-relaxed"></textarea>
                 </div>
+
+                <div id="compiler-status" class="hidden bg-gray-900/90 border border-emerald-500/40 rounded-xl p-3.5 text-xs text-emerald-300 space-y-1"></div>
+
+                <button onclick="compileAndStartExam()" class="w-full btn-duolingo bg-emerald-600 hover:bg-emerald-500 text-white font-black py-4 rounded-2xl text-base flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-bolt"></i> Biên Dịch Đề & Vào Làm Bài Ngay 🚀
+                </button>
             </div>
         </div>
 
@@ -218,7 +207,7 @@
                 </div>
                 <div>
                     <h2 class="text-xl font-black text-white">Học Sinh Chăm Chỉ</h2>
-                    <p class="text-xs text-emerald-400 font-bold">Chương trình Tiếng Anh THCS Global Success</p>
+                    <p class="text-xs text-emerald-400 font-bold">Hệ thống Luyện Đề & Tiếng Anh THCS</p>
                 </div>
                 <div class="grid grid-cols-3 gap-3 pt-4 border-t border-gray-800 text-center">
                     <div class="bg-gray-800/50 p-3 rounded-xl">
@@ -264,8 +253,8 @@
                 <span class="text-xs font-bold mt-1">Bản đồ</span>
             </button>
             <button onclick="switchTab('upload')" id="nav-upload" class="flex flex-col items-center text-gray-400 hover:text-gray-200 transition">
-                <i class="fa-solid fa-file-circle-plus text-xl"></i>
-                <span class="text-xs font-bold mt-1">Tạo Đề</span>
+                <i class="fa-solid fa-file-arrow-up text-xl"></i>
+                <span class="text-xs font-bold mt-1">Upload Đề</span>
             </button>
             <button onclick="switchTab('shop')" id="nav-shop" class="flex flex-col items-center text-gray-400 hover:text-gray-200 transition">
                 <i class="fa-solid fa-store text-xl"></i>
@@ -283,6 +272,7 @@
     </nav>
 
     <script>
+        // --- DỮ LIỆU SGK GLOBAL SUCCESS ---
         const generateUnits = (gradeName, titles) => {
             return titles.map((titleData, i) => ({
                 id: i + 1,
@@ -319,7 +309,6 @@
             { en: "Cities of the World", vi: "Các thành phố trên thế giới" }, { en: "Our Houses in the Future", vi: "Nhà ở tương lai" },
             { en: "Our Greener World", vi: "Thế giới xanh hơn" }, { en: "Robots", vi: "Người máy" }
         ];
-
         const titles7 = [
             { en: "Hobby", vi: "Sở thích" }, { en: "Healthy Living", vi: "Sống khỏe mạnh" },
             { en: "Community Service", vi: "Hoạt động cộng đồng" }, { en: "Music and Arts", vi: "Âm nhạc và nghệ thuật" },
@@ -328,7 +317,6 @@
             { en: "English in the World", vi: "Tiếng Anh trên thế giới" }, { en: "Energy Sources", vi: "Nguồn năng lượng" },
             { en: "Travelling in the Future", vi: "Du lịch tương lai" }, { en: "English Speaking Countries", vi: "Các nước nói tiếng Anh" }
         ];
-
         const titles8 = [
             { en: "Leisure Time", vi: "Thời gian rảnh rỗi" }, { en: "Life in the Countryside", vi: "Cuộc sống nông thôn" },
             { en: "Teenagers", vi: "Thiếu niên" }, { en: "Ethnic Groups", vi: "Các dân tộc thiểu số" },
@@ -337,7 +325,6 @@
             { en: "Natural Disasters", vi: "Thảm họa thiên nhiên" }, { en: "Communication in the Future", vi: "Giao tiếp tương lai" },
             { en: "Science and Technology", vi: "Khoa học và công nghệ" }, { en: "Life on Other Planets", vi: "Sự sống hành tinh khác" }
         ];
-
         const titles9 = [
             { en: "Local Community", vi: "Cộng đồng địa phương" }, { en: "City Life", vi: "Cuộc sống thành phố" },
             { en: "Teenagers", vi: "Giới trẻ" }, { en: "Remembering the Past", vi: "Nhớ về quá khứ" },
@@ -352,7 +339,7 @@
         const dataGrade8 = generateUnits("Lớp 8", titles8);
         const dataGrade9 = generateUnits("Lớp 9", titles9);
 
-        let gameState = JSON.parse(localStorage.getItem('english69_custom_v1')) || {
+        let gameState = JSON.parse(localStorage.getItem('english69_compiler_v1')) || {
             currentGrade: 9, level: 1, xp: 0, streak: 1, coins: 60, hearts: 10, maxHearts: 10, shield: false,
             completedUnits: { 6: [], 7: [], 8: [], 9: [], custom: [] },
             customUnits: [],
@@ -360,7 +347,7 @@
         };
 
         function saveState() {
-            localStorage.setItem('english69_custom_v1', JSON.stringify(gameState));
+            localStorage.setItem('english69_compiler_v1', JSON.stringify(gameState));
             updateHUD();
         }
 
@@ -386,157 +373,277 @@
             btn.innerHTML = gameState.audioEnabled ? '<i class="fa-solid fa-volume-high text-lg"></i>' : '<i class="fa-solid fa-volume-xmark text-lg text-red-400"></i>';
         }
 
-        // --- XỬ LÝ UPLOAD FILE VÀ TẠO ĐỀ TÙY CHỈNH ---
-        function handleFileUpload(event) {
+        // =========================================================================
+        // TRÌNH BIÊN DỊCH ĐỀ THI TỰ ĐỘNG (SMART EXAM COMPILER)
+        // =========================================================================
+
+        // 1. Đọc file .txt hoặc .docx khi người dùng upload
+        function handleAutoExamFile(event) {
             const file = event.target.files[0];
             if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const content = e.target.result;
-                document.getElementById('custom-title').value = file.name.replace(/\.[^/.]+$/, "");
-                
-                // Phân tách thông minh nội dung file
-                const lines = content.split('\n').map(l => l.trim()).filter(l => l);
-                let vocabLines = [];
-                let sentenceLines = [];
-                
-                lines.forEach(line => {
-                    if (line.includes(' - ') && line.split(' - ')[0].split(' ').length <= 3) {
-                        vocabLines.push(line);
-                    } else if (!line.includes('?') && !line.includes('_') && line.split(' ').length >= 4 && line.split(' ').length <= 12) {
-                        sentenceLines.push(line);
+
+            document.getElementById('uploaded-file-name').innerHTML = `<span class="text-emerald-400 font-bold">📄 Đã chọn: ${file.name}</span>`;
+            const cleanTitle = file.name.replace(/\.[^/.]+$/, "");
+            if (!document.getElementById('exam-title-input').value.trim()) {
+                document.getElementById('exam-title-input').value = cleanTitle;
+            }
+
+            if (file.name.toLowerCase().endsWith('.docx')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    mammoth.extractRawText({ arrayBuffer: e.target.result })
+                        .then(result => {
+                            document.getElementById('raw-exam-textarea').value = result.value;
+                            showCompilerPreview(result.value);
+                        })
+                        .catch(err => alert("Không đọc được file Word này: " + err.message));
+                };
+                reader.readAsArrayBuffer(file);
+            } else {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('raw-exam-textarea').value = e.target.result;
+                    showCompilerPreview(e.target.result);
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        // Nạp thử đề thô để người dùng kiểm tra
+        function loadDemoRawExam() {
+            document.getElementById('exam-title-input').value = "Đề Kiểm Tra 15 Phút Tiếng Anh 9 - Global Success";
+            const sample = `Câu 1: The artisans in my village usually _____ baskets from bamboo.
+A. weave
+B. cast
+C. mould
+D. knit
+
+Câu 2: Bat Trang is one of the most famous _____ craft villages in Ha Noi.
+A. traditional
+B. modern
+C. foreign
+D. noisy
+
+Câu 3: They are trying to _____ their traditional customs for future generations.
+A. destroy
+B. preserve
+C. forget
+D. leave
+
+Câu 4: We don't know _____ to put the sofa in this small living room.
+A. what
+B. where
+C. who
+D. why
+
+Câu 5: The _____ the city is, the more expensive the cost of living becomes.
+A. larger
+B. largest
+C. large
+D. more large
+
+Đáp án: 1.A 2.A 3.B 4.B 5.A`;
+            document.getElementById('raw-exam-textarea').value = sample;
+            showCompilerPreview(sample);
+        }
+
+        // Bộ phân tích cú pháp đề tự động (tách câu hỏi, A/B/C/D, bảng đáp án cuối đề, từ vựng, câu ghép)
+        function parseRawExamText(rawText) {
+            const lines = rawText.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+            
+            // Bước 1: Quét bảng đáp án ở cuối đề (nếu có dạng: 1.A 2.B hoặc 1-A, 2-C hoặc 1: B)
+            const answerKeyMap = {};
+            const answerKeyRegex = /\b(\d{1,3})\s*[\.\-\:\)]\s*([A-D])\b/gi;
+            lines.forEach(line => {
+                // Nếu dòng chứa nhiều cặp số-chữ cái (ví dụ: 1.A 2.B 3.C) hoặc bắt đầu bằng "Đáp án" / "Key"
+                const matches = [...line.matchAll(answerKeyRegex)];
+                if (matches.length >= 2 || /^(đáp án|answer|key)/i.test(line)) {
+                    matches.forEach(m => {
+                        answerKeyMap[parseInt(m[1], 10)] = m[2].toUpperCase();
+                    });
+                }
+            });
+
+            // Bước 2: Tách các câu hỏi trắc nghiệm và 4 đáp án A, B, C, D
+            const quizList = [];
+            const vocabMap = new Map();
+            const sentenceList = [];
+
+            let currentQ = null;
+            let qCounter = 0;
+
+            const pushCurrentQuestion = () => {
+                if (currentQ && currentQ.options.length >= 2) {
+                    // Xác định đáp án đúng nếu chưa được đánh dấu *
+                    if (!currentQ.correctText) {
+                        const keyLetter = answerKeyMap[currentQ.number];
+                        if (keyLetter) {
+                            const letterIdx = keyLetter.charCodeAt(0) - 65; // A->0, B->1, C->2, D->3
+                            if (currentQ.options[letterIdx]) {
+                                currentQ.correctText = currentQ.options[letterIdx];
+                            }
+                        }
                     }
-                });
+                    // Fallback nếu đề không ghi đáp án nào
+                    if (!currentQ.correctText) {
+                        currentQ.correctText = currentQ.options[0];
+                    }
 
-                if (vocabLines.length > 0) document.getElementById('custom-vocab').value = vocabLines.join('\n');
-                if (sentenceLines.length > 0) document.getElementById('custom-sentences').value = sentenceLines.slice(0, 5).join('\n');
-                
-                // Đưa phần còn lại vào khung trắc nghiệm để người dùng kiểm tra
-                document.getElementById('custom-quiz').value = content;
-                alert("✅ Đã tải nội dung file lên! Bạn có thể kiểm tra lại các mục rồi bấm 'Tạo Bài Học Mới Ngay'.");
-            };
-            reader.readAsText(file);
-        }
+                    quizList.push({
+                        q: currentQ.q,
+                        options: currentQ.options,
+                        correctText: currentQ.correctText
+                    });
 
-        function fillSampleCustomData() {
-            document.getElementById('custom-title').value = "Đề ôn tập Unit 1 - Local Community";
-            document.getElementById('custom-vocab').value = "community - cộng đồng\nartisan - thợ thủ công\nhandicraft - đồ thủ công mỹ nghệ\npreserve - bảo tồn";
-            document.getElementById('custom-quiz').value = 
-`The artisans in my village usually _____ baskets from bamboo.
-*weave
-cast
-mould
-knit
-
-Bat Trang is one of the most famous _____ craft villages in Ha Noi.
-*traditional
-modern
-new
-foreign
-
-They are trying to _____ their traditional customs for future generations.
-destroy
-*preserve
-forget
-leave`;
-            document.getElementById('custom-sentences').value = "We are proud of our traditional craft village.\nArtisans make beautiful handicrafts by hand.";
-        }
-
-        function createCustomUnit() {
-            const title = document.getElementById('custom-title').value.trim() || `Đề Tự Tạo #${gameState.customUnits.length + 1}`;
-            const vocabRaw = document.getElementById('custom-vocab').value.trim();
-            const quizRaw = document.getElementById('custom-quiz').value.trim();
-            const sentenceRaw = document.getElementById('custom-sentences').value.trim();
-
-            // 1. Parse Từ vựng
-            let vocabList = [];
-            if (vocabRaw) {
-                vocabRaw.split('\n').forEach(line => {
-                    const parts = line.split('-');
-                    if (parts.length >= 2) {
-                        vocabList.push({
-                            en: parts[0].trim(),
-                            vi: parts.slice(1).join('-').trim(),
-                            phonetic: "/custom/",
-                            example: `Practice word: ${parts[0].trim()}`
+                    // Tự động trích xuất từ vựng từ đáp án đúng (nếu là từ đơn/cụm từ ngắn)
+                    const cleanAns = currentQ.correctText.replace(/[^a-zA-Z\s-]/g, '').trim();
+                    if (cleanAns && cleanAns.split(/\s+/).length <= 3 && cleanAns.length >= 3) {
+                        vocabMap.set(cleanAns.toLowerCase(), {
+                            en: cleanAns,
+                            vi: `Từ khóa câu ${quizList.length} (Đáp án đúng)`,
+                            phonetic: "/từ khóa đề thi/",
+                            example: currentQ.q.replace(/_{2,}|\(\d+\)/g, cleanAns)
                         });
                     }
-                });
-            }
-            if (vocabList.length === 0) {
-                vocabList = [{ en: "practice", vi: "luyện tập", phonetic: "/ˈpræktɪs/", example: "Practice makes perfect." }];
-            }
 
-            // 2. Parse Trắc nghiệm
-            let quizList = [];
-            if (quizRaw) {
-                const blocks = quizRaw.split(/\n\s*\n/);
-                blocks.forEach(block => {
-                    const lines = block.split('\n').map(l => l.trim()).filter(l => l);
-                    if (lines.length >= 3) {
-                        const questionText = lines[0];
-                        let options = [];
-                        let correctText = "";
-                        for (let i = 1; i < lines.length; i++) {
-                            let opt = lines[i];
-                            if (opt.startsWith('*')) {
-                                opt = opt.substring(1).trim();
-                                correctText = opt;
-                            }
-                            options.push(opt);
+                    // Tự động tạo câu hoàn chỉnh cho game Ghép Câu bằng cách điền đáp án đúng vào chỗ trống
+                    if (/_{2,}/.test(currentQ.q)) {
+                        const completedSentence = currentQ.q
+                            .replace(/^(Câu|Question)\s*\d+\s*[\.\:\)]\s*/i, '')
+                            .replace(/_{2,}/, currentQ.correctText)
+                            .trim();
+                        const words = completedSentence.replace(/[.!?]$/, '').split(/\s+/);
+                        if (words.length >= 4 && words.length <= 14) {
+                            sentenceList.push({
+                                scrambled: words,
+                                correct: completedSentence
+                            });
                         }
-                        if (!correctText && options.length > 0) correctText = options[0];
-                        quizList.push({ q: questionText, options, correctText });
                     }
-                });
-            }
-            if (quizList.length === 0) {
-                quizList = [{ q: "Chọn từ đồng nghĩa với 'study':", options: ["learn", "sleep", "play", "eat"], correctText: "learn" }];
-            }
-
-            // 3. Parse Ghép câu
-            let sentenceList = [];
-            if (sentenceRaw) {
-                sentenceRaw.split('\n').map(s => s.trim()).filter(s => s).forEach(s => {
-                    const clean = s.replace(/[.!?]$/, '');
-                    const words = clean.split(/\s+/);
-                    if (words.length >= 2) {
-                        sentenceList.push({ scrambled: words, correct: s });
-                    }
-                });
-            }
-            if (sentenceList.length === 0) {
-                sentenceList = [{ scrambled: ["English", "is", "fun"], correct: "English is fun." }];
-            }
-
-            const newId = gameState.customUnits.length + 1;
-            const newUnit = {
-                id: newId,
-                title: title,
-                vietnamese: `Đề tự tải lên (${vocabList.length} từ, ${quizList.length} câu hỏi)`,
-                semester: 1,
-                vocab: vocabList,
-                grammar: { title: `Tổng hợp kiến thức: ${title}`, content: "Bài học được tạo tự động từ đề thi/tài liệu bạn đã cung cấp. Hãy chinh phục cả 4 chặng để làm chủ kiến thức!" },
-                quiz: quizList,
-                sentences: sentenceList,
-                boss: { name: `Boss: ${title}`, hp: 100, questions: quizList.length }
+                }
             };
 
-            gameState.customUnits.push(newUnit);
+            lines.forEach(line => {
+                // Bỏ qua dòng bảng đáp án cuối trang
+                if (/^(đáp án|answer|key)\b/i.test(line) && [...line.matchAll(answerKeyRegex)].length >= 1) {
+                    return;
+                }
+
+                // Kiểm tra dòng bắt đầu câu hỏi mới: "Câu 1:", "Question 1.", "1.", "1)"
+                const qStartMatch = line.match(/^(?:Câu|Question|Bài)?\s*(\d{1,3})\s*[\.\:\)]\s*(.+)/i);
+                // Kiểm tra dòng chứa các phương án A. B. C. D.
+                const inlineOptionsMatch = line.match(/(?:^|\s)(\*?[A-D])\s*[\.\)\:]\s*/g);
+
+                if (qStartMatch && !/^[A-D][\.\)]/i.test(line)) {
+                    pushCurrentQuestion();
+                    qCounter = parseInt(qStartMatch[1], 10);
+                    currentQ = {
+                        number: qCounter,
+                        q: qStartMatch[2].trim(),
+                        options: [],
+                        correctText: ""
+                    };
+                } else if (currentQ && inlineOptionsMatch && inlineOptionsMatch.length >= 1) {
+                    // Tách trường hợp 4 đáp án nằm trên cùng 1 dòng (VD: "A. go   B. goes   C. going   D. went") hoặc mỗi đáp án 1 dòng
+                    const parts = line.split(/(?=(?:^|\s)\*?[A-D]\s*[\.\)\:]\s*)/).map(p => p.trim()).filter(p => p);
+                    parts.forEach(part => {
+                        const optMatch = part.match(/^(\*?)([A-D])\s*[\.\)\:]\s*(.+)/i);
+                        if (optMatch) {
+                            const isMarkedCorrect = optMatch[1] === '*';
+                            let optText = optMatch[3].trim();
+                            if (optText.endsWith('*')) {
+                                optText = optText.slice(0, -1).trim();
+                                currentQ.correctText = optText;
+                            }
+                            if (isMarkedCorrect) {
+                                currentQ.correctText = optText;
+                            }
+                            currentQ.options.push(optText);
+                        }
+                    });
+                } else if (currentQ && currentQ.options.length === 0) {
+                    // Nối tiếp phần đề bài nếu câu hỏi xuống dòng
+                    currentQ.q += " " + line;
+                }
+            });
+
+            pushCurrentQuestion();
+
+            // Đảm bảo luôn có dữ liệu tối thiểu cho cả 4 chặng
+            const vocabList = Array.from(vocabMap.values());
+            if (vocabList.length === 0) {
+                vocabList.push({ en: "vocabulary", vi: "từ vựng trọng tâm", phonetic: "/vəˈkæbjələri/", example: "Review your exam vocabulary." });
+            }
+            if (sentenceList.length === 0 && quizList.length > 0) {
+                sentenceList.push({ scrambled: ["English", "practice", "makes", "perfect"], correct: "English practice makes perfect." });
+            }
+
+            return { quizList, vocabList, sentenceList };
+        }
+
+        function showCompilerPreview(rawText) {
+            const parsed = parseRawExamText(rawText);
+            const statusBox = document.getElementById('compiler-status');
+            statusBox.classList.remove('hidden');
+            statusBox.innerHTML = `
+                <p class="font-bold text-white"><i class="fa-solid fa-check-circle text-emerald-400"></i> Đã nhận diện cấu trúc đề:</p>
+                <p>• Trích xuất được <b>${parsed.quizList.length}</b> câu hỏi trắc nghiệm (tự động khớp đáp án).</p>
+                <p>• Tự động tạo <b>${parsed.vocabList.length}</b> thẻ từ vựng & <b>${parsed.sentenceList.length}</b> câu luyện ghép câu.</p>
+            `;
+        }
+
+        function compileAndStartExam() {
+            const rawText = document.getElementById('raw-exam-textarea').value.trim();
+            if (!rawText) {
+                alert("⚠️ Bạn chưa tải file lên hoặc dán nội dung đề thi!");
+                return;
+            }
+
+            const parsed = parseRawExamText(rawText);
+            if (parsed.quizList.length === 0) {
+                alert("⚠️ Không nhận diện được câu hỏi trắc nghiệm nào. Hãy đảm bảo đề có đánh số câu (VD: Câu 1: ... hoặc 1. ...) và các lựa chọn A. B. C. D.");
+                return;
+            }
+
+            const title = document.getElementById('exam-title-input').value.trim() || `Đề Biên Dịch #${gameState.customUnits.length + 1}`;
+            const newId = gameState.customUnits.length + 1;
+
+            const compiledUnit = {
+                id: newId,
+                title: title,
+                vietnamese: `Biên dịch tự động: ${parsed.quizList.length} câu trắc nghiệm • ${parsed.vocabList.length} từ vựng`,
+                semester: 1,
+                vocab: parsed.vocabList,
+                grammar: {
+                    title: `Tổng quan đề: ${title}`,
+                    content: `Hệ thống đã biên dịch tự động ${parsed.quizList.length} câu hỏi từ đề của bạn thành 4 chặng luyện tập tương tác.`
+                },
+                quiz: parsed.quizList,
+                sentences: parsed.sentenceList,
+                boss: { name: `Boss: ${title}`, hp: 100, questions: parsed.quizList.length }
+            };
+
+            gameState.customUnits.push(compiledUnit);
+            gameState.currentGrade = 'custom';
             saveState();
-            alert("🎉 Đã tạo bài học từ đề của bạn thành công!");
+
             switchTab('map');
             switchGrade('custom');
+            // Mở thẳng vào Chặng 2 (Làm đề trắc nghiệm vừa biên dịch) để người dùng làm bài ngay
+            startStage(newId, 2);
         }
 
         function deleteCustomUnit(id) {
-            if (confirm("Xóa bài học tự tạo này?")) {
+            if (confirm("Xóa đề đã biên dịch này?")) {
                 gameState.customUnits = gameState.customUnits.filter(u => u.id !== id);
                 saveState();
                 renderMap();
             }
         }
 
+        // =========================================================================
+        // ĐIỀU HƯỚNG & GAMEPLAY
+        // =========================================================================
         let currentSemesterFilter = 1;
 
         function switchGrade(grade) {
@@ -592,25 +699,22 @@ leave`;
                 mapContainer.innerHTML = `
                     <div class="game-card p-8 text-center space-y-4">
                         <div class="w-16 h-16 bg-purple-500/20 text-purple-400 rounded-full mx-auto flex items-center justify-center text-3xl">
-                            <i class="fa-solid fa-file-circle-plus"></i>
+                            <i class="fa-solid fa-file-arrow-up"></i>
                         </div>
-                        <h3 class="text-lg font-black text-white">Chưa có đề tự tạo nào</h3>
-                        <p class="text-xs text-gray-400 max-w-md mx-auto">Hãy tải file đề của bạn lên hoặc dán nội dung câu hỏi để hệ thống tự động biến thành trò chơi học tập!</p>
+                        <h3 class="text-lg font-black text-white">Chưa có đề nào được biên dịch</h3>
+                        <p class="text-xs text-gray-400 max-w-md mx-auto">Tải lên file Word (.docx), file văn bản (.txt) hoặc dán đề thi của bạn để hệ thống tự động biên dịch thành bài học và đề thi tương tác!</p>
                         <button onclick="switchTab('upload')" class="btn-duolingo bg-purple-600 hover:bg-purple-500 text-white font-bold px-6 py-3 rounded-xl text-sm">
-                            + Tạo Bài Học Từ Đề Ngay
+                            <i class="fa-solid fa-cloud-arrow-up"></i> Upload & Biên Dịch Đề Ngay
                         </button>
                     </div>`;
                 return;
             }
 
             const filtered = gameState.currentGrade === 'custom' ? units : units.filter(u => u.semester === currentSemesterFilter);
-
             if(!gameState.completedUnits[gameState.currentGrade]) gameState.completedUnits[gameState.currentGrade] = [];
 
             filtered.forEach(unit => {
                 const completedArr = gameState.completedUnits[gameState.currentGrade];
-
-                // Đề tự tạo mở khóa sẵn để học luôn; SGK mở khóa tuần tự
                 const isUnlocked = gameState.currentGrade === 'custom' || unit.id === 1 || completedArr.includes(unit.id - 1);
                 const isCompleted = completedArr.includes(unit.id);
                 const progressCount = isCompleted ? 4 : 0;
@@ -626,7 +730,7 @@ leave`;
                             </div>
                             <div>
                                 <span class="text-xs font-bold ${isUnlocked ? 'text-emerald-400' : 'text-gray-400'}">
-                                    ${gameState.currentGrade === 'custom' ? 'ĐỀ TỰ TẢI LÊN' : `LỚP ${gameState.currentGrade} • HK${unit.semester}`}
+                                    ${gameState.currentGrade === 'custom' ? 'ĐỀ ĐÃ BIÊN DỊCH TỰ ĐỘNG' : `LỚP ${gameState.currentGrade} • HK${unit.semester}`}
                                 </span>
                                 <h3 class="text-base sm:text-lg font-black text-white">${unit.title}</h3>
                                 <p class="text-xs text-gray-400">${unit.vietnamese}</p>
@@ -651,7 +755,7 @@ leave`;
                         <button onclick="${isUnlocked ? `startStage(${unit.id}, 2)` : 'lockedAlert()'}" class="p-2.5 rounded-xl text-left bg-gray-800/60 hover:bg-gray-800 transition flex items-center gap-2">
                             <i class="fa-solid fa-book-open text-blue-400"></i>
                             <div class="overflow-hidden">
-                                <p class="text-xs font-bold text-white truncate">2. Trắc Nghiệm</p>
+                                <p class="text-xs font-bold text-white truncate">2. Làm Đề</p>
                                 <span class="text-[10px] text-gray-400">${unit.quiz.length} câu</span>
                             </div>
                         </button>
@@ -666,7 +770,7 @@ leave`;
                             <i class="fa-solid fa-dragon text-red-400"></i>
                             <div class="overflow-hidden">
                                 <p class="text-xs font-bold text-white truncate">4. Đấu Boss</p>
-                                <span class="text-[10px] text-gray-400">Tổng hợp</span>
+                                <span class="text-[10px] text-gray-400">Thi thử</span>
                             </div>
                         </button>
                     </div>
@@ -746,7 +850,10 @@ leave`;
         function startStage(unitId, stageNum) {
             const units = getUnitsByGrade(gameState.currentGrade);
             currentUnitObj = units.find(u => u.id === unitId);
-            currentStageIdx = stageNum; lessonStep = 0; heartsLostInThisLesson = 0;
+            currentStageIdx = stageNum;
+            // Nếu là đề tự biên dịch vào Chặng 2 (Làm đề), vào thẳng câu hỏi 1 luôn cho nhanh
+            lessonStep = (gameState.currentGrade === 'custom' && stageNum === 2) ? 1 : 0;
+            heartsLostInThisLesson = 0;
             document.getElementById('lesson-modal').classList.remove('hidden');
             loadStageContent();
         }
@@ -773,7 +880,8 @@ leave`;
             if (gameState.hearts <= 0) return;
             const container = document.getElementById('lesson-content');
             const totalSteps = currentStageIdx === 1 ? currentUnitObj.vocab.length : (currentStageIdx === 3 ? currentUnitObj.sentences.length : currentUnitObj.quiz.length);
-            document.getElementById('lesson-progress').style.width = `${Math.min(100, (lessonStep / Math.max(1, totalSteps)) * 100)}%`;
+            const currentProgressStep = (currentStageIdx === 2 && lessonStep > 0) ? lessonStep - 1 : lessonStep;
+            document.getElementById('lesson-progress').style.width = `${Math.min(100, (currentProgressStep / Math.max(1, totalSteps)) * 100)}%`;
 
             if (currentStageIdx === 1) {
                 if (lessonStep < currentUnitObj.vocab.length) {
@@ -789,8 +897,8 @@ leave`;
                                         <span class="text-xs bg-gray-800 text-gray-300 px-3 py-1 rounded-full">Chạm để lật</span>
                                     </div>
                                     <div class="flip-card-back bg-emerald-600 text-white rounded-2xl p-6 flex flex-col justify-center items-center">
-                                        <h3 class="text-2xl font-black mb-2">${v.vi}</h3>
-                                        <p class="text-sm italic mb-4">"${v.example}"</p>
+                                        <h3 class="text-xl font-black mb-2">${v.vi}</h3>
+                                        <p class="text-xs italic mb-4">"${v.example}"</p>
                                     </div>
                                 </div>
                             </div>
@@ -802,12 +910,12 @@ leave`;
                 if (lessonStep === 0) {
                     container.innerHTML = `
                         <div class="space-y-6 text-center">
-                            <span class="text-xs font-bold text-blue-400 uppercase">Chặng 2: Trắc Nghiệm Kiến Thức</span>
+                            <span class="text-xs font-bold text-blue-400 uppercase">Chặng 2: Trắc Nghiệm</span>
                             <div class="bg-[#202f36] p-6 rounded-2xl border border-gray-700 text-left space-y-3">
                                 <h3 class="text-lg font-black text-white">${currentUnitObj.grammar.title}</h3>
                                 <p class="text-sm text-gray-300">${currentUnitObj.grammar.content}</p>
                             </div>
-                            <button onclick="lessonStep++; loadStageContent();" class="btn-duolingo w-full bg-emerald-600 text-white font-black py-3.5 rounded-2xl text-lg">Bắt đầu làm bài (${currentUnitObj.quiz.length} câu) ➔</button>
+                            <button onclick="lessonStep++; loadStageContent();" class="btn-duolingo w-full bg-emerald-600 text-white font-black py-3.5 rounded-2xl text-lg">Bắt đầu làm đề (${currentUnitObj.quiz.length} câu) ➔</button>
                         </div>`;
                 } else {
                     const qIdx = lessonStep - 1;
@@ -816,9 +924,9 @@ leave`;
                         container.innerHTML = `
                             <div class="space-y-6">
                                 <span class="text-xs font-bold text-blue-400 uppercase">Câu hỏi ${qIdx + 1}/${currentUnitObj.quiz.length}</span>
-                                <h3 class="text-xl font-black text-white">${q.q}</h3>
+                                <h3 class="text-xl font-black text-white leading-relaxed">${q.q}</h3>
                                 <div class="grid grid-cols-1 gap-3">
-                                    ${q.options.map((opt) => `<button onclick="checkQuizAnswer(this, '${opt.replace(/'/g, "\\'")}', '${q.correctText.replace(/'/g, "\\'")}')" class="option-btn btn-duolingo w-full text-left p-4 rounded-2xl bg-[#202f36] border-2 border-gray-700 font-bold text-white"><span>${opt}</span></button>`).join('')}
+                                    ${q.options.map((opt, idx) => `<button onclick="checkQuizAnswer(this, '${opt.replace(/'/g, "\\'")}', '${q.correctText.replace(/'/g, "\\'")}')" class="option-btn btn-duolingo w-full text-left p-4 rounded-2xl bg-[#202f36] border-2 border-gray-700 font-bold text-white flex items-center gap-3"><span class="w-7 h-7 rounded-lg bg-gray-800 text-emerald-400 flex items-center justify-center text-xs font-black">${String.fromCharCode(65 + idx)}</span><span>${opt}</span></button>`).join('')}
                                 </div>
                             </div>`;
                     } else { finishStageReward(); }
@@ -835,9 +943,9 @@ leave`;
                             <div class="bg-red-500/10 border border-red-500/30 p-4 rounded-2xl">
                                 <h4 class="font-black text-red-400 text-lg"><i class="fa-solid fa-dragon"></i> Đấu Boss (${lessonStep + 1}/${currentUnitObj.quiz.length})</h4>
                             </div>
-                            <h3 class="text-xl font-black text-white">${q.q}</h3>
+                            <h3 class="text-xl font-black text-white leading-relaxed">${q.q}</h3>
                             <div class="grid grid-cols-1 gap-3">
-                                ${q.options.map((opt) => `<button onclick="checkBossAnswer(this, '${opt.replace(/'/g, "\\'")}', '${q.correctText.replace(/'/g, "\\'")}')" class="option-btn btn-duolingo w-full text-left p-4 rounded-2xl bg-[#202f36] border-2 border-gray-700 font-bold text-white"><span>${opt}</span></button>`).join('')}
+                                ${q.options.map((opt, idx) => `<button onclick="checkBossAnswer(this, '${opt.replace(/'/g, "\\'")}', '${q.correctText.replace(/'/g, "\\'")}')" class="option-btn btn-duolingo w-full text-left p-4 rounded-2xl bg-[#202f36] border-2 border-gray-700 font-bold text-white flex items-center gap-3"><span class="w-7 h-7 rounded-lg bg-gray-800 text-red-400 flex items-center justify-center text-xs font-black">${String.fromCharCode(65 + idx)}</span><span>${opt}</span></button>`).join('')}
                             </div>
                         </div>`;
                 } else { finishStageReward(); }
@@ -846,22 +954,22 @@ leave`;
 
         function checkQuizAnswer(btnEl, selectedText, correctText) {
             if (selectedText.trim() === correctText.trim()) {
-                btnEl.className = "btn-duolingo w-full text-left p-4 rounded-2xl bg-emerald-600 border-2 border-emerald-500 font-bold text-white";
-                setTimeout(() => { lessonStep++; loadStageContent(); }, 800);
+                btnEl.className = "btn-duolingo w-full text-left p-4 rounded-2xl bg-emerald-600 border-2 border-emerald-500 font-bold text-white flex items-center gap-3";
+                setTimeout(() => { lessonStep++; loadStageContent(); }, 700);
             } else {
                 loseHeart(); if (gameState.hearts <= 0) return;
-                btnEl.className = "btn-duolingo w-full text-left p-4 rounded-2xl bg-red-600/50 border-2 border-red-500 font-bold text-white opacity-50 pointer-events-none";
+                btnEl.className = "btn-duolingo w-full text-left p-4 rounded-2xl bg-red-600/50 border-2 border-red-500 font-bold text-white opacity-50 pointer-events-none flex items-center gap-3";
                 alert("❌ Chưa đúng! Hãy suy nghĩ kỹ lại nhé.");
             }
         }
 
         function checkBossAnswer(btnEl, selectedText, correctText) {
             if (selectedText.trim() === correctText.trim()) {
-                btnEl.className = "btn-duolingo w-full text-left p-4 rounded-2xl bg-emerald-600 border-2 border-emerald-500 font-bold text-white";
-                setTimeout(() => { lessonStep++; loadStageContent(); }, 800);
+                btnEl.className = "btn-duolingo w-full text-left p-4 rounded-2xl bg-emerald-600 border-2 border-emerald-500 font-bold text-white flex items-center gap-3";
+                setTimeout(() => { lessonStep++; loadStageContent(); }, 700);
             } else {
                 loseHeart(); if (gameState.hearts <= 0) return;
-                btnEl.className = "btn-duolingo w-full text-left p-4 rounded-2xl bg-red-600/50 border-2 border-red-500 font-bold text-white opacity-50 pointer-events-none";
+                btnEl.className = "btn-duolingo w-full text-left p-4 rounded-2xl bg-red-600/50 border-2 border-red-500 font-bold text-white opacity-50 pointer-events-none flex items-center gap-3";
                 alert("❌ Boss phản công! Chưa đúng, hãy thử lại.");
             }
         }
@@ -936,7 +1044,7 @@ leave`;
             const grade = gameState.currentGrade;
             if(!gameState.completedUnits[grade]) gameState.completedUnits[grade] = [];
 
-            if (currentStageIdx === 4 && !gameState.completedUnits[grade].includes(currentUnitObj.id)) {
+            if ((currentStageIdx === 4 || grade === 'custom') && !gameState.completedUnits[grade].includes(currentUnitObj.id)) {
                 gameState.completedUnits[grade].push(currentUnitObj.id);
             }
 
@@ -948,7 +1056,7 @@ leave`;
                         <i class="fa-solid fa-trophy"></i>
                     </div>
                     <div>
-                        <h2 class="text-2xl font-black text-white">Hoàn Thành Xuất Sắc Chặng Này!</h2>
+                        <h2 class="text-2xl font-black text-white">Hoàn Thành Xuất Sắc!</h2>
                         <p class="text-sm text-emerald-400 mt-1">${currentUnitObj.title}</p>
                         <p class="text-xs text-gray-400 mt-2">+25 XP | +10 Vàng ${bonusText}</p>
                     </div>
