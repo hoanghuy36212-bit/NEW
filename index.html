@@ -85,7 +85,6 @@
         #auth-screen .input-box input:valid {
             border-color: #0ef;
         }
-        /* Riêng ô code: không bắt buộc required để bỏ trống vẫn là Học sinh */
         #auth-screen .input-box input.code-input:not(:placeholder-shown),
         #auth-screen .input-box input.code-input:focus {
             border-color: #0ef;
@@ -246,7 +245,7 @@
                     </div>
                     <div class="input-box">
                         <input type="text" id="signup-code" class="code-input" placeholder=" " oninput="clearCodeError()">
-                        <label>Code</label>
+                        <label>Code (E69 = Giáo viên, trống = Học sinh)</label>
                         <p id="signup-code-error" class="code-field-error"></p>
                     </div>
                     <button type="submit" class="btn">Create Account</button>
@@ -461,6 +460,27 @@
                 </div>
             </div>
 
+            <!-- CLASSROOM VIEW (GIÁO VIÊN TẠO LỚP, THÊM BẰNG USER ID, GIAO BÀI; HỌC SINH LÀM BÀI) -->
+            <div id="view-classes" class="hidden space-y-6">
+                <div id="teacher-create-class-card" class="hidden game-card p-6 space-y-4">
+                    <div>
+                        <span class="text-[11px] font-black uppercase text-purple-400">Quyền Giáo Viên (E69)</span>
+                        <h2 class="text-xl font-black text-white flex items-center gap-2 mt-0.5">
+                            <i class="fa-solid fa-chalkboard-user text-purple-400"></i> Tạo Lớp Học Mới
+                        </h2>
+                        <p class="text-xs text-gray-400 mt-1">Chỉ tài khoản Giáo viên mới có thể tạo lớp, thêm học sinh bằng <b>User ID</b> và giao bài cho lớp.</p>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <input type="text" id="new-class-name" placeholder="Tên lớp học (VD: Lớp 9A1 - Global Success)" class="flex-1 bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:border-purple-500 focus:outline-none">
+                        <button onclick="createNewClass()" class="btn-duolingo bg-purple-600 hover:bg-purple-500 text-white font-black px-5 py-2.5 rounded-xl text-sm shrink-0">
+                            <i class="fa-solid fa-plus"></i> Tạo Lớp
+                        </button>
+                    </div>
+                </div>
+
+                <div id="classes-list-container" class="space-y-5"></div>
+            </div>
+
             <!-- SHOP VIEW -->
             <div id="view-shop" class="hidden space-y-6">
                 <div class="bg-[#202f36] p-6 rounded-2xl border border-gray-800 text-center">
@@ -517,6 +537,7 @@
                     <div>
                         <h2 id="prof-username" class="text-xl font-black text-white">Học Sinh Chăm Chỉ</h2>
                         <p id="prof-role-badge" class="inline-block mt-1 px-3 py-0.5 rounded-full text-xs font-extrabold bg-emerald-500/20 text-emerald-300">Học sinh</p>
+                        <p class="text-xs text-cyan-300 font-mono font-bold mt-1.5">User ID: <span id="prof-userid">---</span></p>
                         <p id="prof-email" class="text-xs text-emerald-400 font-bold mt-1">Chương trình Tiếng Anh THCS Global Success</p>
                     </div>
                     <div class="grid grid-cols-3 gap-3 pt-4 border-t border-gray-800 text-center">
@@ -562,7 +583,7 @@
 
         <!-- BOTTOM NAVIGATION -->
         <nav class="fixed bottom-0 left-0 right-0 bg-[#131f24]/95 backdrop-blur border-t border-gray-800 py-2 z-40">
-            <div class="max-w-md mx-auto flex justify-around">
+            <div class="max-w-lg mx-auto flex justify-around">
                 <button onclick="switchTab('map')" id="nav-map" class="flex flex-col items-center text-emerald-400 transition">
                     <i class="fa-solid fa-map text-xl"></i>
                     <span class="text-xs font-bold mt-1">Bản đồ</span>
@@ -570,6 +591,10 @@
                 <button onclick="switchTab('upload')" id="nav-upload" class="flex flex-col items-center text-gray-400 hover:text-gray-200 transition">
                     <i class="fa-solid fa-layer-group text-xl"></i>
                     <span class="text-xs font-bold mt-1">Tạo Đề</span>
+                </button>
+                <button onclick="switchTab('classes')" id="nav-classes" class="flex flex-col items-center text-gray-400 hover:text-gray-200 transition">
+                    <i class="fa-solid fa-chalkboard text-xl"></i>
+                    <span class="text-xs font-bold mt-1">Lớp học</span>
                 </button>
                 <button onclick="switchTab('shop')" id="nav-shop" class="flex flex-col items-center text-gray-400 hover:text-gray-200 transition">
                     <i class="fa-solid fa-store text-xl"></i>
@@ -593,18 +618,50 @@
         }
 
         // =========================================================================
-        // HỆ THỐNG ĐĂNG NHẬP & ĐĂNG KÝ (CÓ KIỂM TRA CODE E69)
+        // HỆ THỐNG ĐĂNG NHẬP, ĐĂNG KÝ, USER ID & LỚP HỌC / GIAO BÀI
         // =========================================================================
         const USERS_STORAGE_KEY = 'english69_users_v1';
         const ACTIVE_USER_KEY = 'english69_active_user_v1';
+        const CLASSES_STORAGE_KEY = 'english69_classes_v1';
         let currentUserEmail = localStorage.getItem(ACTIVE_USER_KEY) || "";
 
+        function generateUserId() {
+            const rand = Math.floor(1000 + Math.random() * 9000);
+            return `USR-${rand}`;
+        }
+
         function getUsersMap() {
-            return JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '{}');
+            const map = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '{}');
+            let changed = false;
+            Object.keys(map).forEach(email => {
+                if (!map[email].userId) {
+                    map[email].userId = generateUserId();
+                    changed = true;
+                }
+                if (!map[email].role) {
+                    map[email].role = "Học sinh";
+                    changed = true;
+                }
+            });
+            if (changed) saveUsersMap(map);
+            return map;
         }
 
         function saveUsersMap(map) {
             localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(map));
+        }
+
+        function getClassesList() {
+            return JSON.parse(localStorage.getItem(CLASSES_STORAGE_KEY) || '[]');
+        }
+
+        function saveClassesList(list) {
+            localStorage.setItem(CLASSES_STORAGE_KEY, JSON.stringify(list));
+        }
+
+        function getCurrentUserInfo() {
+            const users = getUsersMap();
+            return users[currentUserEmail] || null;
         }
 
         function clearCodeError() {
@@ -656,10 +713,6 @@
             const msgEl = document.getElementById('signup-msg');
             msgEl.innerText = "";
 
-            // Kiểm tra Code:
-            // - Trống -> Học sinh
-            // - E69 (không phân biệt hoa/thường) -> Giáo viên
-            // - Khác -> Báo lỗi tại code
             let role = "Học sinh";
             if (rawCode !== "") {
                 if (rawCode.toUpperCase() === "E69") {
@@ -678,7 +731,8 @@
                 return;
             }
 
-            users[email] = { username, email, password, role };
+            const userId = generateUserId();
+            users[email] = { userId, username, email, password, role };
             saveUsersMap(users);
             enterMainApp(email);
         }
@@ -705,12 +759,13 @@
             document.getElementById('app-shell').classList.remove('hidden');
 
             const users = getUsersMap();
-            const userInfo = users[email] || { username: "Học Sinh Chăm Chỉ", email, role: "Học sinh" };
+            const userInfo = users[email] || { userId: generateUserId(), username: "Học Sinh Chăm Chỉ", email, role: "Học sinh" };
             const role = userInfo.role || "Học sinh";
 
             gameState = loadUserGameState(email);
-            document.getElementById('hud-user-label').innerText = `${userInfo.username} (${role})`;
+            document.getElementById('hud-user-label').innerText = `${userInfo.username} (${role}) • ${userInfo.userId}`;
             document.getElementById('prof-username').innerText = userInfo.username;
+            document.getElementById('prof-userid').innerText = userInfo.userId;
             document.getElementById('prof-role-badge').innerText = role;
             document.getElementById('prof-role-badge').className = role === "Giáo viên"
                 ? "inline-block mt-1 px-3 py-0.5 rounded-full text-xs font-extrabold bg-purple-500/20 text-purple-300"
@@ -720,6 +775,7 @@
 
             switchGrade(gameState.currentGrade || 9);
             updateHUD();
+            renderClassesView();
         }
 
         function logoutUser() {
@@ -728,6 +784,329 @@
             document.getElementById('app-shell').classList.add('hidden');
             document.getElementById('auth-screen').style.display = 'flex';
             toggleAuthMode('login');
+        }
+
+        // --- QUẢN LÝ LỚP HỌC & GIAO BÀI ---
+        function createNewClass() {
+            const user = getCurrentUserInfo();
+            if (!user || user.role !== "Giáo viên") {
+                alert("❌ Chỉ tài khoản Giáo viên mới có thể tạo lớp học!");
+                return;
+            }
+            const nameInput = document.getElementById('new-class-name');
+            const className = nameInput.value.trim();
+            if (!className) {
+                alert("⚠️ Vui lòng nhập tên lớp học!");
+                return;
+            }
+
+            const classes = getClassesList();
+            classes.push({
+                id: `CLS-${Date.now()}`,
+                name: className,
+                teacherEmail: user.email,
+                teacherName: user.username,
+                teacherId: user.userId,
+                studentIds: [],
+                assignments: []
+            });
+            saveClassesList(classes);
+            nameInput.value = "";
+            renderClassesView();
+        }
+
+        function addStudentToClassById(classId) {
+            const user = getCurrentUserInfo();
+            if (!user || user.role !== "Giáo viên") return;
+
+            const inputEl = document.getElementById(`add-student-input-${classId}`);
+            const targetId = (inputEl.value || "").trim().toUpperCase();
+            if (!targetId) {
+                alert("⚠️ Vui lòng nhập User ID của học sinh (VD: USR-1234)!");
+                return;
+            }
+
+            const users = getUsersMap();
+            const foundEntry = Object.values(users).find(u => (u.userId || "").toUpperCase() === targetId);
+            if (!foundEntry) {
+                alert(`❌ Không tìm thấy tài khoản nào có User ID: ${targetId}`);
+                return;
+            }
+            if (foundEntry.role !== "Học sinh") {
+                alert(`⚠️ Tài khoản ${targetId} không phải là Học sinh (vai trò hiện tại: ${foundEntry.role}).`);
+                return;
+            }
+
+            const classes = getClassesList();
+            const cls = classes.find(c => c.id === classId);
+            if (!cls) return;
+
+            if (!cls.studentIds.includes(foundEntry.userId)) {
+                cls.studentIds.push(foundEntry.userId);
+                saveClassesList(classes);
+                inputEl.value = "";
+                renderClassesView();
+                alert(`✅ Đã thêm học sinh ${foundEntry.username} (${foundEntry.userId}) vào lớp ${cls.name}!`);
+            } else {
+                alert("ℹ️ Học sinh này đã có trong lớp rồi.");
+            }
+        }
+
+        function assignWorkToClass(classId) {
+            const user = getCurrentUserInfo();
+            if (!user || user.role !== "Giáo viên") return;
+
+            const selectCustom = document.getElementById(`assign-custom-select-${classId}`);
+            const titleEl = document.getElementById(`assign-title-${classId}`);
+            const qEl = document.getElementById(`assign-q-${classId}`);
+            const ansEl = document.getElementById(`assign-ans-${classId}`);
+
+            let assignmentTitle = titleEl.value.trim();
+            let quizItems = [];
+
+            if (selectCustom && selectCustom.value) {
+                const chosenUnit = gameState.customUnits.find(u => String(u.id) === String(selectCustom.value));
+                if (chosenUnit) {
+                    assignmentTitle = assignmentTitle || chosenUnit.title;
+                    quizItems = chosenUnit.quiz.map(q => ({
+                        q: q.q,
+                        options: q.options,
+                        correctText: q.correctText
+                    }));
+                }
+            }
+
+            if (quizItems.length === 0) {
+                const rawQ = (qEl.value || "").trim();
+                const rawAns = (ansEl.value || "").trim();
+                if (!rawQ) {
+                    alert("⚠️ Hãy chọn một Đề Đã Tạo hoặc nhập câu hỏi để giao bài!");
+                    return;
+                }
+                const keyMap = parseSeparateAnswers(rawAns);
+                const lines = rawQ.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+                let cur = null;
+                let idxCounter = 0;
+
+                const pushItem = () => {
+                    if (cur && cur.options.length >= 2) {
+                        idxCounter++;
+                        const keyVal = (keyMap[cur.num] || keyMap[idxCounter] || "").trim();
+                        let correctText = cur.options[0];
+                        if (keyVal) {
+                            const upper = keyVal.toUpperCase();
+                            if (/^[A-D]$/.test(upper)) {
+                                const optIdx = upper.charCodeAt(0) - 65;
+                                if (cur.options[optIdx]) correctText = cur.options[optIdx];
+                            } else {
+                                const found = cur.options.find(o => o.toLowerCase() === keyVal.toLowerCase());
+                                correctText = found || keyVal;
+                            }
+                        }
+                        quizItems.push({ q: cur.q, options: cur.options, correctText });
+                    }
+                };
+
+                lines.forEach(line => {
+                    const qMatch = line.match(/^(?:Câu|Question)?\s*(\d{1,3})\s*[\.\:\)]\s*(.+)/i);
+                    const hasOpt = /(?:^|\s)[A-D]\s*[\.\)\:]\s*/i.test(line);
+                    if (qMatch && !/^[A-D][\.\)]/i.test(line)) {
+                        pushItem();
+                        cur = { num: parseInt(qMatch[1], 10), q: qMatch[2].trim(), options: [] };
+                    } else if (cur && hasOpt) {
+                        const parts = line.split(/(?=(?:^|\s)[A-D]\s*[\.\)\:]\s*)/i).map(p => p.trim()).filter(Boolean);
+                        parts.forEach(p => {
+                            const om = p.match(/^[A-D]\s*[\.\)\:]\s*(.+)/i);
+                            if (om) cur.options.push(om[1].trim());
+                        });
+                    } else if (cur && cur.options.length === 0) {
+                        cur.q += " " + line;
+                    }
+                });
+                pushItem();
+            }
+
+            if (quizItems.length === 0) {
+                alert("⚠️ Không đọc được câu hỏi hợp lệ. Hãy kiểm tra định dạng câu hỏi và A. B. C. D.");
+                return;
+            }
+
+            const classes = getClassesList();
+            const cls = classes.find(c => c.id === classId);
+            if (!cls) return;
+
+            cls.assignments.push({
+                id: `ASN-${Date.now()}`,
+                title: assignmentTitle || `Bài tập giao (${quizItems.length} câu)`,
+                quiz: quizItems,
+                createdAt: new Date().toLocaleDateString('vi-VN')
+            });
+            saveClassesList(classes);
+
+            titleEl.value = "";
+            qEl.value = "";
+            ansEl.value = "";
+            if (selectCustom) selectCustom.value = "";
+            renderClassesView();
+            alert(`✅ Đã giao bài "${assignmentTitle || 'Bài tập'}" cho lớp ${cls.name}!`);
+        }
+
+        function startAssignedLesson(classId, assignmentId) {
+            const classes = getClassesList();
+            const cls = classes.find(c => c.id === classId);
+            if (!cls) return;
+            const asn = cls.assignments.find(a => a.id === assignmentId);
+            if (!asn) return;
+
+            currentUnitObj = {
+                id: asn.id,
+                title: `${cls.name} • ${asn.title}`,
+                vietnamese: `Bài giao bởi GV ${cls.teacherName}`,
+                vocab: [],
+                grammar: { title: asn.title, content: `Bài tập lớp ${cls.name}` },
+                quiz: asn.quiz,
+                sentences: []
+            };
+            currentStageIdx = 2;
+            lessonStep = 1;
+            heartsLostInThisLesson = 0;
+            document.getElementById('lesson-modal').classList.remove('hidden');
+            loadStageContent();
+        }
+
+        function renderClassesView() {
+            const user = getCurrentUserInfo();
+            if (!user) return;
+
+            const createCard = document.getElementById('teacher-create-class-card');
+            const listContainer = document.getElementById('classes-list-container');
+            const users = getUsersMap();
+            const allClasses = getClassesList();
+
+            const isTeacher = user.role === "Giáo viên";
+            if (isTeacher) {
+                createCard.classList.remove('hidden');
+            } else {
+                createCard.classList.add('hidden');
+            }
+
+            const visibleClasses = isTeacher
+                ? allClasses.filter(c => c.teacherEmail === user.email)
+                : allClasses.filter(c => (c.studentIds || []).includes(user.userId));
+
+            listContainer.innerHTML = "";
+
+            if (visibleClasses.length === 0) {
+                listContainer.innerHTML = `
+                    <div class="game-card p-8 text-center space-y-2">
+                        <i class="fa-solid fa-users-slash text-3xl text-gray-500"></i>
+                        <h3 class="text-base font-black text-white">
+                            ${isTeacher ? "Bạn chưa tạo lớp học nào" : "Bạn chưa được thêm vào lớp học nào"}
+                        </h3>
+                        <p class="text-xs text-gray-400">
+                            ${isTeacher
+                                ? "Nhập tên lớp ở khung phía trên để tạo lớp đầu tiên."
+                                : `Hãy gửi User ID của bạn (${user.userId}) cho giáo viên để được thêm vào lớp.`}
+                        </p>
+                    </div>`;
+                return;
+            }
+
+            const customOptionsHtml = (gameState.customUnits || []).map(u =>
+                `<option value="${u.id}">${u.title} (${u.quiz.length} câu)</option>`
+            ).join('');
+
+            visibleClasses.forEach(cls => {
+                const membersHtml = (cls.studentIds || []).length === 0
+                    ? `<p class="text-xs text-gray-500 italic">Chưa có học sinh nào trong lớp.</p>`
+                    : `<div class="flex flex-wrap gap-2">
+                        ${cls.studentIds.map(sid => {
+                            const st = Object.values(users).find(u => u.userId === sid);
+                            return `<span class="px-2.5 py-1 rounded-lg bg-gray-900 border border-gray-700 text-xs text-gray-200 font-bold">
+                                ${st ? st.username : "Học sinh"} <span class="text-cyan-400 font-mono">(${sid})</span>
+                            </span>`;
+                        }).join('')}
+                    </div>`;
+
+                const assignmentsHtml = (cls.assignments || []).length === 0
+                    ? `<p class="text-xs text-gray-500 italic">Chưa có bài tập nào được giao.</p>`
+                    : `<div class="space-y-2">
+                        ${cls.assignments.map(asn => `
+                            <div class="bg-gray-900/90 border border-gray-700/80 rounded-xl p-3 flex items-center justify-between gap-3">
+                                <div>
+                                    <p class="text-sm font-extrabold text-white">${asn.title}</p>
+                                    <span class="text-[11px] text-gray-400">${asn.quiz.length} câu hỏi • Giao ngày ${asn.createdAt}</span>
+                                </div>
+                                <button onclick="startAssignedLesson('${cls.id}', '${asn.id}')" class="btn-duolingo bg-emerald-600 hover:bg-emerald-500 text-white font-black px-3.5 py-2 rounded-xl text-xs shrink-0">
+                                    Làm bài <i class="fa-solid fa-play ml-1"></i>
+                                </button>
+                            </div>
+                        `).join('')}
+                    </div>`;
+
+                const teacherControlsHtml = isTeacher ? `
+                    <div class="pt-3 border-t border-gray-800 space-y-4">
+                        <!-- Thêm học sinh bằng User ID -->
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-extrabold text-cyan-300">
+                                <i class="fa-solid fa-user-plus"></i> Thêm học sinh bằng User ID:
+                            </label>
+                            <div class="flex flex-col sm:flex-row gap-2">
+                                <input type="text" id="add-student-input-${cls.id}" placeholder="Nhập User ID học sinh (VD: USR-1234)" class="flex-1 bg-gray-900 border border-gray-700 rounded-xl px-3.5 py-2 text-xs sm:text-sm text-white font-mono focus:border-cyan-400 focus:outline-none">
+                                <button onclick="addStudentToClassById('${cls.id}')" class="btn-duolingo bg-cyan-500 hover:bg-cyan-400 text-gray-950 font-black px-4 py-2 rounded-xl text-xs shrink-0">
+                                    Thêm vào lớp
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Giao bài cho lớp -->
+                        <div class="bg-gray-900/60 border border-gray-700/70 rounded-xl p-3.5 space-y-2.5">
+                            <label class="block text-xs font-extrabold text-emerald-400">
+                                <i class="fa-solid fa-file-circle-plus"></i> Giao bài cho học sinh trong lớp:
+                            </label>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                <input type="text" id="assign-title-${cls.id}" placeholder="Tên bài giao (VD: Bài tập Unit 1)" class="bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:border-emerald-500 focus:outline-none">
+                                <select id="assign-custom-select-${cls.id}" class="bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-gray-200 focus:border-emerald-500 focus:outline-none">
+                                    <option value="">-- Hoặc chọn từ Đề Đã Tạo --</option>
+                                    ${customOptionsHtml}
+                                </select>
+                            </div>
+                            <textarea id="assign-q-${cls.id}" rows="3" placeholder="Nhập nhanh câu hỏi (nếu không chọn Đề Đã Tạo):&#10;Câu 1: She _____ to school every day.&#10;A. go&#10;B. goes&#10;C. going&#10;D. went" class="w-full bg-gray-950 border border-gray-800 rounded-xl p-2.5 text-xs text-white font-mono focus:border-emerald-500 focus:outline-none"></textarea>
+                            <input type="text" id="assign-ans-${cls.id}" placeholder="Đáp án đối chiếu (VD: 1.B)" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white font-mono focus:border-emerald-500 focus:outline-none">
+                            <button onclick="assignWorkToClass('${cls.id}')" class="btn-duolingo bg-emerald-600 hover:bg-emerald-500 text-white font-black px-4 py-2 rounded-xl text-xs">
+                                <i class="fa-solid fa-paper-plane"></i> Giao Bài Ngay
+                            </button>
+                        </div>
+                    </div>
+                ` : "";
+
+                const card = document.createElement('div');
+                card.className = "game-card p-5 space-y-4";
+                card.innerHTML = `
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <div>
+                            <span class="text-[11px] font-bold text-purple-400">GV: ${cls.teacherName} (${cls.teacherId || ""})</span>
+                            <h3 class="text-lg font-black text-white">${cls.name}</h3>
+                        </div>
+                        <span class="px-3 py-1 rounded-full bg-gray-800 text-xs font-bold text-gray-300">
+                            ${(cls.studentIds || []).length} học sinh • ${(cls.assignments || []).length} bài giao
+                        </span>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <p class="text-xs font-bold text-gray-400">Danh sách học sinh trong lớp:</p>
+                        ${membersHtml}
+                    </div>
+
+                    <div class="space-y-2">
+                        <p class="text-xs font-bold text-gray-400">Bài tập đã giao:</p>
+                        ${assignmentsHtml}
+                    </div>
+
+                    ${teacherControlsHtml}
+                `;
+                listContainer.appendChild(card);
+            });
         }
 
         // =========================================================================
@@ -1311,7 +1690,7 @@ D. leave`;
         }
 
         function switchTab(tab) {
-            ['map', 'upload', 'shop', 'badges', 'profile'].forEach(t => {
+            ['map', 'upload', 'classes', 'shop', 'badges', 'profile'].forEach(t => {
                 const viewEl = t === 'map' ? document.getElementById('view-map-wrapper') : document.getElementById(`view-${t}`);
                 const navEl = document.getElementById(`nav-${t}`);
                 if (viewEl) viewEl.classList.add('hidden');
@@ -1323,6 +1702,7 @@ D. leave`;
             if (activeView) activeView.classList.remove('hidden');
             if (activeNav) activeNav.className = "flex flex-col items-center text-emerald-400 transition";
 
+            if (tab === 'classes') renderClassesView();
             if (tab === 'badges') renderBadges();
             if (tab === 'profile') updateProfileStats();
         }
@@ -1569,10 +1949,10 @@ D. leave`;
             }
 
             const grade = gameState.currentGrade;
-            if(!gameState.completedUnits[grade]) gameState.completedUnits[grade] = [];
-
-            if (currentStageIdx === 4 && !gameState.completedUnits[grade].includes(currentUnitObj.id)) {
-                gameState.completedUnits[grade].push(currentUnitObj.id);
+            if (grade && gameState.completedUnits[grade]) {
+                if (currentStageIdx === 4 && !gameState.completedUnits[grade].includes(currentUnitObj.id)) {
+                    gameState.completedUnits[grade].push(currentUnitObj.id);
+                }
             }
 
             saveState(); confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
