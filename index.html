@@ -10,9 +10,163 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Eater&family=Sancreek&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
-        body { font-family: 'Nunito', sans-serif; background-color: #131f24; color: #e5e7eb; user-select: none; }
+        /* --- PHẦN CSS ĐĂNG NHẬP / ĐĂNG KÝ THEO MẪU CỦA BẠN --- */
+        #auth-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #1f293a;
+            overflow: hidden;
+        }
+        #auth-screen * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+            font-family: "Sancreek", serif;
+        }
+        #auth-screen .container {
+            position: relative;
+            width: 256px;
+            height: 256px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #auth-screen .container span {
+            position: absolute;
+            left: 0;
+            width: 32px;
+            height: 6px;
+            background: #2c4766;
+            border-radius: 8px;
+            transform-origin: 128px;
+            transform: scale(2.2) rotate(calc(var(--i) * (360deg / 50)));
+            animation: animateBlink 1s linear infinite;
+            animation-delay: calc(var(--i) * (1s / 50));
+        }
+        #auth-screen .login-box {
+            position: absolute;
+            width: 400px;
+            max-width: 92vw;
+            z-index: 2;
+        }
+        #auth-screen .login-box form {
+            width: 100%;
+            padding: 0 50px;
+        }
+        #auth-screen h2 {
+            font-size: 2em;
+            color: #0ef;
+            text-align: center;
+        }
+        #auth-screen .input-box {
+            position: relative;
+            margin: 22px 0;
+        }
+        #auth-screen .input-box input {
+            width: 100%;
+            height: 50px;
+            background: #1f293a;
+            border: 2px solid #2c4766;
+            outline: none;
+            border-radius: 40px;
+            font-size: 1em;
+            color: #fff;
+            padding: 0 20px;
+            transition: 0.5s ease;
+        }
+        #auth-screen .input-box input:focus,
+        #auth-screen .input-box input:valid {
+            border-color: #0ef;
+        }
+        #auth-screen .input-box label {
+            position: absolute;
+            top: 50%;
+            left: 20px;
+            transform: translateY(-50%);
+            font-size: 1em;
+            color: #fff;
+            pointer-events: none;
+            transition: 0.5s ease;
+        }
+        #auth-screen .input-box input:focus ~ label,
+        #auth-screen .input-box input:valid ~ label {
+            top: 1px;
+            font-size: 0.8em;
+            background: #1f293a;
+            padding: 0 6px;
+            color: #0ef;
+        }
+        #auth-screen .forgot-password {
+            text-align: center;
+            margin-bottom: 14px;
+        }
+        #auth-screen .forgot-password a {
+            font-size: 0.85em;
+            color: #fff;
+            text-decoration: none;
+        }
+        #auth-screen .forgot-password a:hover {
+            text-decoration: underline;
+        }
+        #auth-screen .btn {
+            width: 100%;
+            height: 45px;
+            background: #0ef;
+            border: none;
+            outline: none;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 1em;
+            color: #1f293a;
+            font-weight: 600;
+            transition: 0.25s ease;
+        }
+        #auth-screen .btn:hover {
+            filter: brightness(1.08);
+        }
+        #auth-screen .signup-link {
+            margin: 18px 0 8px;
+            text-align: center;
+        }
+        #auth-screen .signup-link a {
+            font-size: 1em;
+            color: #0ef;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        #auth-screen .signup-link a:hover {
+            text-decoration: underline;
+        }
+        #auth-screen .auth-msg {
+            margin-top: 10px;
+            text-align: center;
+            font-size: 0.8em;
+            color: #fde047;
+            min-height: 18px;
+        }
+        @keyframes animateBlink {
+            0% {
+                background: #0ef;
+            }
+            50% {
+                background: #2c4766;
+            }
+        }
+
+        /* --- PHẦN CSS ỨNG DỤNG CHÍNH --- */
+        #app-shell {
+            font-family: 'Nunito', sans-serif;
+            background-color: #131f24;
+            color: #e5e7eb;
+            user-select: none;
+        }
         .game-card { background: #202f36; border: 2px solid #374151; border-radius: 1rem; transition: all 0.2s; }
         .game-card:hover { border-color: #4b5563; }
         .btn-duolingo { transition: all 0.1s ease; box-shadow: 0 4px 0 0 rgba(0,0,0,0.3); }
@@ -27,327 +181,499 @@
         ::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
     </style>
 </head>
-<body class="min-h-screen pb-24">
+<body>
 
-    <!-- TOP HUD BAR -->
-    <header class="sticky top-0 z-50 bg-[#131f24]/95 backdrop-blur border-b border-gray-800 px-4 py-3">
-        <div class="max-w-4xl mx-auto flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="bg-emerald-500 text-white font-black px-3 py-1 rounded-xl text-lg shadow-lg flex items-center gap-1">
-                    <i class="fa-solid fa-graduation-cap"></i> E6-9
-                </div>
-                <div>
-                    <h1 class="font-extrabold text-sm sm:text-base text-gray-200">English Quest</h1>
-                    <span class="text-xs text-emerald-400 font-bold">Global Success + Modular Exam</span>
-                </div>
-            </div>
-
-            <div class="flex items-center space-x-3 sm:space-x-5 text-sm font-bold">
-                <div class="flex items-center gap-2 bg-gray-800/80 px-3 py-1.5 rounded-full border border-gray-700">
-                    <span id="level-badge" class="bg-purple-600 text-white text-xs px-2 py-0.5 rounded-full">Lv.1</span>
-                    <div class="w-12 sm:w-20 bg-gray-700 h-2 rounded-full overflow-hidden">
-                        <div id="xp-bar" class="bg-purple-500 h-full w-0 transition-all duration-300"></div>
+    <!-- MÀN HÌNH ĐĂNG NHẬP & ĐĂNG KÝ (THEO HTML/CSS CỦA BẠN) -->
+    <div id="auth-screen">
+        <div class="container">
+            <!-- FORM LOGIN -->
+            <div class="login-box" id="login-panel">
+                <h2>Login</h2>
+                <form id="login-form" onsubmit="handleLoginSubmit(event)">
+                    <div class="input-box">
+                        <input type="email" id="login-email" required>
+                        <label>Email</label>
                     </div>
-                </div>
-
-                <div class="flex items-center gap-1 text-orange-400" title="Chuỗi ngày">
-                    <i class="fa-solid fa-fire"></i>
-                    <span id="streak-count">1</span>
-                </div>
-
-                <div class="flex items-center gap-1 text-yellow-400" title="Xu vàng">
-                    <i class="fa-solid fa-coins"></i>
-                    <span id="coins-count">60</span>
-                </div>
-
-                <div class="flex items-center gap-1 text-red-500" title="Tim">
-                    <i class="fa-solid fa-heart"></i>
-                    <span id="hearts-count">10</span>
-                </div>
-
-                <button onclick="toggleAudio()" id="audio-btn" class="text-gray-400 hover:text-white transition">
-                    <i class="fa-solid fa-volume-high text-lg"></i>
-                </button>
+                    <div class="input-box">
+                        <input type="password" id="login-password" required>
+                        <label>Password</label>
+                    </div>
+                    <div class="forgot-password">
+                        <a href="#" onclick="handleForgotPassword(event)">Forgot Password?</a>
+                    </div>
+                    <button type="submit" class="btn">Login</button>
+                    <p id="login-msg" class="auth-msg"></p>
+                    <div class="signup-link">
+                        <a href="#" onclick="toggleAuthMode('signup', event)">Sign up</a>
+                    </div>
+                </form>
             </div>
+
+            <!-- FORM SIGN UP -->
+            <div class="login-box" id="signup-panel" style="display: none;">
+                <h2>Sign up</h2>
+                <form id="signup-form" onsubmit="handleSignupSubmit(event)">
+                    <div class="input-box">
+                        <input type="text" id="signup-name" required>
+                        <label>Username</label>
+                    </div>
+                    <div class="input-box">
+                        <input type="email" id="signup-email" required>
+                        <label>Email</label>
+                    </div>
+                    <div class="input-box">
+                        <input type="password" id="signup-password" required>
+                        <label>Password</label>
+                    </div>
+                    <button type="submit" class="btn">Create Account</button>
+                    <p id="signup-msg" class="auth-msg"></p>
+                    <div class="signup-link">
+                        <a href="#" onclick="toggleAuthMode('login', event)">Back to Login</a>
+                    </div>
+                </form>
+            </div>
+
+            <span style="--i: 0"></span><span style="--i: 1"></span><span style="--i: 2"></span><span style="--i: 3"></span><span style="--i: 4"></span>
+            <span style="--i: 5"></span><span style="--i: 6"></span><span style="--i: 7"></span><span style="--i: 8"></span><span style="--i: 9"></span>
+            <span style="--i: 10"></span><span style="--i: 11"></span><span style="--i: 12"></span><span style="--i: 13"></span><span style="--i: 14"></span>
+            <span style="--i: 15"></span><span style="--i: 16"></span><span style="--i: 17"></span><span style="--i: 18"></span><span style="--i: 19"></span>
+            <span style="--i: 20"></span><span style="--i: 21"></span><span style="--i: 22"></span><span style="--i: 23"></span><span style="--i: 24"></span>
+            <span style="--i: 25"></span><span style="--i: 26"></span><span style="--i: 27"></span><span style="--i: 28"></span><span style="--i: 29"></span>
+            <span style="--i: 30"></span><span style="--i: 31"></span><span style="--i: 32"></span><span style="--i: 33"></span><span style="--i: 34"></span>
+            <span style="--i: 35"></span><span style="--i: 36"></span><span style="--i: 37"></span><span style="--i: 38"></span><span style="--i: 39"></span>
+            <span style="--i: 40"></span><span style="--i: 41"></span><span style="--i: 42"></span><span style="--i: 43"></span><span style="--i: 44"></span>
+            <span style="--i: 45"></span><span style="--i: 46"></span><span style="--i: 47"></span><span style="--i: 48"></span><span style="--i: 49"></span>
         </div>
-    </header>
-
-    <!-- MAIN CONTAINER -->
-    <main class="max-w-4xl mx-auto px-4 mt-6">
-        
-        <!-- MAP VIEW -->
-        <div id="view-map-wrapper">
-            <div class="bg-[#202f36] p-4 rounded-2xl border border-gray-800 mb-6 space-y-3">
-                <div class="flex flex-col sm:flex-row justify-between items-center gap-3">
-                    <div>
-                        <h2 class="text-lg font-bold text-white flex items-center gap-2">
-                            <i class="fa-solid fa-map-location-dot text-emerald-400"></i> Bản Đồ Chinh Phục
-                        </h2>
-                        <p class="text-xs text-gray-400">Hoàn thành đủ 4 chặng để mở khóa Unit tiếp theo</p>
-                    </div>
-                    <div class="flex flex-wrap gap-1.5 bg-gray-900/60 p-1.5 rounded-xl border border-gray-700 justify-center">
-                        <button onclick="switchGrade(6)" id="btn-grade-6" class="px-3 py-1 text-xs font-bold rounded-lg bg-gray-800 text-gray-300 transition">Lớp 6</button>
-                        <button onclick="switchGrade(7)" id="btn-grade-7" class="px-3 py-1 text-xs font-bold rounded-lg bg-gray-800 text-gray-300 transition">Lớp 7</button>
-                        <button onclick="switchGrade(8)" id="btn-grade-8" class="px-3 py-1 text-xs font-bold rounded-lg bg-gray-800 text-gray-300 transition">Lớp 8</button>
-                        <button onclick="switchGrade(9)" id="btn-grade-9" class="px-3 py-1 text-xs font-bold rounded-lg bg-emerald-600 text-white transition">Lớp 9</button>
-                        <button onclick="switchGrade('custom')" id="btn-grade-custom" class="px-3 py-1 text-xs font-bold rounded-lg bg-purple-700 text-white transition flex items-center gap-1">
-                            <i class="fa-solid fa-wand-magic-sparkles"></i> Đề Đã Tạo
-                        </button>
-                    </div>
-                </div>
-
-                <div id="semester-filter-bar" class="flex justify-between items-center pt-2 border-t border-gray-800">
-                    <div class="flex gap-2">
-                        <button onclick="filterSemester(1)" id="btn-sem-1" class="px-3 py-1.5 text-xs font-bold rounded-xl bg-emerald-600 text-white transition">Học kỳ I</button>
-                        <button onclick="filterSemester(2)" id="btn-sem-2" class="px-3 py-1.5 text-xs font-bold rounded-xl bg-gray-700 text-gray-300 transition">Học kỳ II</button>
-                    </div>
-                    <button onclick="switchTab('upload')" class="btn-duolingo bg-purple-600 hover:bg-purple-500 text-white px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5">
-                        <i class="fa-solid fa-plus-circle"></i> Tạo Đề & Quizz
-                    </button>
-                </div>
-            </div>
-
-            <div id="view-map" class="space-y-6"></div>
-        </div>
-
-        <!-- MODULAR EXAM CREATOR + IN-TAB QUIZZ VIEW -->
-        <div id="view-upload" class="hidden space-y-6">
-            <div class="bg-[#202f36] p-6 rounded-2xl border border-gray-800 space-y-5">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                    <div>
-                        <h2 class="text-xl font-black text-white flex items-center gap-2">
-                            <i class="fa-solid fa-layer-group text-purple-400"></i> Tạo Đề Theo Từng Phần & Làm Quizz
-                        </h2>
-                        <p class="text-xs text-gray-400 mt-1">
-                            Upload hoặc nhập riêng từng phần (Từ vựng, Câu hỏi đề, Ghép câu) và cung cấp <b>file đáp án riêng</b> để máy tự đối chiếu kết quả.
-                        </p>
-                    </div>
-                    <button onclick="fillModularSample()" class="px-3 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-purple-300 font-bold text-xs transition self-start">
-                        <i class="fa-solid fa-flask"></i> Nạp dữ liệu mẫu
-                    </button>
-                </div>
-
-                <!-- Tên bài học -->
-                <div>
-                    <label class="block text-xs font-bold text-gray-300 mb-1">Tên bài học / Bộ đề:</label>
-                    <input type="text" id="mod-title" placeholder="Ví dụ: Đề ôn tập Tiếng Anh 9 - Phần 1" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:border-purple-500 focus:outline-none">
-                </div>
-
-                <!-- PHẦN 1: TỪ VỰNG -->
-                <div class="bg-gray-900/60 border border-gray-700/80 rounded-2xl p-4 space-y-2">
-                    <div class="flex items-center justify-between gap-2">
-                        <label class="text-xs font-extrabold text-emerald-400 uppercase">
-                            <i class="fa-solid fa-gem"></i> Phần 1: Từ Vựng (từ Anh - nghĩa Việt)
-                        </label>
-                        <label class="cursor-pointer bg-gray-800 hover:bg-gray-700 text-gray-200 text-[11px] font-bold px-3 py-1 rounded-lg border border-gray-600 transition">
-                            <i class="fa-solid fa-upload"></i> Upload file từ vựng
-                            <input type="file" accept="*" class="hidden" onchange="loadPartFile(event, 'mod-vocab')">
-                        </label>
-                    </div>
-                    <textarea id="mod-vocab" rows="3" placeholder="environment - môi trường&#10;pollution - sự ô nhiễm&#10;preserve - bảo tồn" class="w-full bg-gray-950 border border-gray-800 rounded-xl p-3 text-xs sm:text-sm text-white focus:border-emerald-500 focus:outline-none font-mono"></textarea>
-                </div>
-
-                <!-- PHẦN 2: CÂU HỎI TRẮC NGHIỆM (ĐỀ) -->
-                <div class="bg-gray-900/60 border border-gray-700/80 rounded-2xl p-4 space-y-2">
-                    <div class="flex items-center justify-between gap-2">
-                        <label class="text-xs font-extrabold text-blue-400 uppercase">
-                            <i class="fa-solid fa-list-check"></i> Phần 2: Câu Hỏi Trắc Nghiệm (Đề)
-                        </label>
-                        <label class="cursor-pointer bg-gray-800 hover:bg-gray-700 text-gray-200 text-[11px] font-bold px-3 py-1 rounded-lg border border-gray-600 transition">
-                            <i class="fa-solid fa-upload"></i> Upload file đề câu hỏi
-                            <input type="file" accept="*" class="hidden" onchange="loadPartFile(event, 'mod-questions')">
-                        </label>
-                    </div>
-                    <textarea id="mod-questions" rows="6" placeholder="Câu 1: She _____ to school every day.&#10;A. go&#10;B. goes&#10;C. going&#10;D. went&#10;&#10;Câu 2: My brother is very _____ and helpful.&#10;A. kind&#10;B. lazily&#10;C. slow&#10;D. noise" class="w-full bg-gray-950 border border-gray-800 rounded-xl p-3 text-xs sm:text-sm text-white focus:border-blue-500 focus:outline-none font-mono"></textarea>
-                </div>
-
-                <!-- PHẦN 3: GHÉP CÂU -->
-                <div class="bg-gray-900/60 border border-gray-700/80 rounded-2xl p-4 space-y-2">
-                    <div class="flex items-center justify-between gap-2">
-                        <label class="text-xs font-extrabold text-yellow-400 uppercase">
-                            <i class="fa-solid fa-puzzle-piece"></i> Phần 3: Câu Hoàn Chỉnh Cho Ghép Câu
-                        </label>
-                        <label class="cursor-pointer bg-gray-800 hover:bg-gray-700 text-gray-200 text-[11px] font-bold px-3 py-1 rounded-lg border border-gray-600 transition">
-                            <i class="fa-solid fa-upload"></i> Upload file ghép câu
-                            <input type="file" accept="*" class="hidden" onchange="loadPartFile(event, 'mod-sentences')">
-                        </label>
-                    </div>
-                    <textarea id="mod-sentences" rows="2" placeholder="We should protect our environment.&#10;Students are learning English now." class="w-full bg-gray-950 border border-gray-800 rounded-xl p-3 text-xs sm:text-sm text-white focus:border-yellow-500 focus:outline-none font-mono"></textarea>
-                </div>
-
-                <!-- PHẦN 4: FILE / KHUNG ĐÁP ÁN RIÊNG ĐỂ ĐỐI CHIẾU -->
-                <div class="bg-purple-950/25 border border-purple-500/50 rounded-2xl p-4 space-y-2">
-                    <div class="flex items-center justify-between gap-2">
-                        <div>
-                            <label class="text-xs font-extrabold text-purple-300 uppercase">
-                                <i class="fa-solid fa-key"></i> Phần 4: Đáp Án Riêng (Để Máy Tự Đối Chiếu)
-                            </label>
-                            <p class="text-[11px] text-gray-400">Hỗ trợ dạng <code class="text-purple-300">1.B, 2.A, 3.C</code> hoặc <code class="text-purple-300">1: goes, 2: kind</code> hoặc mỗi dòng 1 đáp án.</p>
-                        </div>
-                        <label class="cursor-pointer bg-purple-700 hover:bg-purple-600 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg transition shrink-0">
-                            <i class="fa-solid fa-file-circle-check"></i> Upload file đáp án
-                            <input type="file" accept="*" class="hidden" onchange="loadPartFile(event, 'mod-answers')">
-                        </label>
-                    </div>
-                    <textarea id="mod-answers" rows="3" placeholder="1.B  2.A  3.C&#10;Hoặc:&#10;Câu 1: goes&#10;Câu 2: kind" class="w-full bg-gray-950 border border-purple-800/60 rounded-xl p-3 text-xs sm:text-sm text-white focus:border-purple-400 focus:outline-none font-mono"></textarea>
-                </div>
-
-                <div id="mod-match-summary" class="hidden bg-gray-900 border border-emerald-500/40 rounded-xl p-3 text-xs text-emerald-300"></div>
-
-                <!-- 2 NÚT HÀNH ĐỘNG: CHƠI QUIZZ NGAY TẠI ĐÂY HOẶC LƯU THÀNH UNIT -->
-                <div class="flex flex-col sm:flex-row gap-3 pt-1">
-                    <button onclick="startCreatorQuizz()" class="flex-1 btn-duolingo bg-purple-600 hover:bg-purple-500 text-white font-black py-3.5 rounded-2xl text-sm sm:text-base flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-gamepad"></i> Làm Quizz Ngay Tại Đây 🎯
-                    </button>
-                    <button onclick="saveModularUnitToMap()" class="flex-1 btn-duolingo bg-emerald-600 hover:bg-emerald-500 text-white font-black py-3.5 rounded-2xl text-sm sm:text-base flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-floppy-disk"></i> Lưu Thành Unit Vào Bản Đồ
-                    </button>
-                </div>
-            </div>
-
-            <!-- KHU VỰC LÀM QUIZZ NGAY TRONG PHẦN TẠO ĐỀ -->
-            <div id="creator-quizz-box" class="hidden bg-[#202f36] p-6 rounded-2xl border-2 border-purple-500/60 space-y-5">
-                <div class="flex items-center justify-between border-b border-gray-800 pb-3">
-                    <div>
-                        <span class="text-[11px] font-black text-purple-400 uppercase">Quizz Trong Phần Tạo Đề</span>
-                        <h3 id="quizz-progress-label" class="text-base font-black text-white">Câu 1/1</h3>
-                    </div>
-                    <div class="flex items-center gap-4 text-sm font-bold">
-                        <span class="text-emerald-400"><i class="fa-solid fa-check-circle"></i> Điểm: <span id="quizz-score">0</span></span>
-                        <button onclick="document.getElementById('creator-quizz-box').classList.add('hidden')" class="text-gray-400 hover:text-white text-xs">
-                            <i class="fa-solid fa-xmark"></i> Đóng Quizz
-                        </button>
-                    </div>
-                </div>
-
-                <div id="quizz-stage-body" class="space-y-4"></div>
-            </div>
-        </div>
-
-        <!-- SHOP VIEW -->
-        <div id="view-shop" class="hidden space-y-6">
-            <div class="bg-[#202f36] p-6 rounded-2xl border border-gray-800 text-center">
-                <h2 class="text-2xl font-black text-white mb-2"><i class="fa-solid fa-store text-yellow-400"></i> Cửa Hàng Vật Phẩm</h2>
-                <p class="text-sm text-gray-400">Dùng xu vàng kiếm được để hồi phục tim hoặc mua trợ giúp.</p>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div class="game-card p-5 flex items-center justify-between">
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 rounded-2xl bg-red-500/20 text-red-500 flex items-center justify-center text-2xl font-bold">
-                            <i class="fa-solid fa-heart"></i>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-white">Hồi Phục Đầy Tim</h3>
-                            <p class="text-xs text-gray-400">Khôi phục ngay lại 10 Tim ❤️</p>
-                        </div>
-                    </div>
-                    <button onclick="buyHearts()" class="btn-duolingo bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-extrabold px-4 py-2 rounded-xl text-sm flex items-center gap-1">
-                        <i class="fa-solid fa-coins"></i> 30
-                    </button>
-                </div>
-                <div class="game-card p-5 flex items-center justify-between">
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 rounded-2xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-2xl font-bold">
-                            <i class="fa-solid fa-shield-cat"></i>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-white">Khiên Bảo Vệ Tim</h3>
-                            <p class="text-xs text-gray-400">Miễn nhiễm mất tim trong bài tiếp theo</p>
-                        </div>
-                    </div>
-                    <button onclick="buyShield()" class="btn-duolingo bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-extrabold px-4 py-2 rounded-xl text-sm flex items-center gap-1">
-                        <i class="fa-solid fa-coins"></i> 50
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- BADGES VIEW -->
-        <div id="view-badges" class="hidden space-y-6">
-            <div class="bg-[#202f36] p-6 rounded-2xl border border-gray-800 text-center">
-                <h2 class="text-2xl font-black text-white mb-2"><i class="fa-solid fa-trophy text-yellow-400"></i> Phòng Trưng bày Huy Hiệu</h2>
-                <p class="text-sm text-gray-400">Chinh phục các Unit để sưu tầm huy hiệu danh giá.</p>
-            </div>
-            <div id="badges-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-4"></div>
-        </div>
-
-        <!-- PROFILE VIEW -->
-        <div id="view-profile" class="hidden space-y-6">
-            <div class="game-card p-6 text-center space-y-4">
-                <div class="w-20 h-20 bg-emerald-500 rounded-full mx-auto flex items-center justify-center text-3xl font-black text-white shadow-xl">
-                    E69
-                </div>
-                <div>
-                    <h2 class="text-xl font-black text-white">Học Sinh Chăm Chỉ</h2>
-                    <p class="text-xs text-emerald-400 font-bold">Chương trình Tiếng Anh THCS Global Success</p>
-                </div>
-                <div class="grid grid-cols-3 gap-3 pt-4 border-t border-gray-800 text-center">
-                    <div class="bg-gray-800/50 p-3 rounded-xl">
-                        <span id="prof-score" class="block text-xl font-black text-yellow-400">0</span>
-                        <span class="text-xs text-gray-400">Tổng XP</span>
-                    </div>
-                    <div class="bg-gray-800/50 p-3 rounded-xl">
-                        <span id="prof-hearts" class="block text-xl font-black text-red-500">10</span>
-                        <span class="text-xs text-gray-400">Tim hiện tại</span>
-                    </div>
-                    <div class="bg-gray-800/50 p-3 rounded-xl">
-                        <span id="prof-streak" class="block text-xl font-black text-orange-400">1</span>
-                        <span class="text-xs text-gray-400">Chuỗi ngày</span>
-                    </div>
-                </div>
-                <button onclick="resetData()" class="text-xs text-red-400 hover:text-red-300 underline pt-2">Đặt lại toàn bộ tiến trình học</button>
-            </div>
-        </div>
-
-    </main>
-
-    <!-- LESSON MODAL -->
-    <div id="lesson-modal" class="fixed inset-0 z-50 bg-[#131f24] hidden flex flex-col">
-        <header class="bg-[#202f36] px-4 py-3 border-b border-gray-800 flex items-center justify-between">
-            <button onclick="closeLesson()" class="text-gray-400 hover:text-white text-lg px-2 py-1">
-                <i class="fa-solid fa-xmark"></i> Thoát
-            </button>
-            <div class="w-1/2 bg-gray-700 h-3 rounded-full overflow-hidden">
-                <div id="lesson-progress" class="bg-emerald-500 h-full w-0 transition-all duration-300"></div>
-            </div>
-            <div class="flex items-center gap-2 text-red-500 font-bold">
-                <i class="fa-solid fa-heart"></i> <span id="modal-hearts">10</span>
-            </div>
-        </header>
-        <div id="lesson-content" class="flex-1 max-w-2xl w-full mx-auto p-4 flex flex-col justify-center overflow-y-auto"></div>
     </div>
 
-    <!-- BOTTOM NAVIGATION -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-[#131f24]/95 backdrop-blur border-t border-gray-800 py-2 z-40">
-        <div class="max-w-md mx-auto flex justify-around">
-            <button onclick="switchTab('map')" id="nav-map" class="flex flex-col items-center text-emerald-400 transition">
-                <i class="fa-solid fa-map text-xl"></i>
-                <span class="text-xs font-bold mt-1">Bản đồ</span>
-            </button>
-            <button onclick="switchTab('upload')" id="nav-upload" class="flex flex-col items-center text-gray-400 hover:text-gray-200 transition">
-                <i class="fa-solid fa-layer-group text-xl"></i>
-                <span class="text-xs font-bold mt-1">Tạo Đề</span>
-            </button>
-            <button onclick="switchTab('shop')" id="nav-shop" class="flex flex-col items-center text-gray-400 hover:text-gray-200 transition">
-                <i class="fa-solid fa-store text-xl"></i>
-                <span class="text-xs font-bold mt-1">Cửa hàng</span>
-            </button>
-            <button onclick="switchTab('badges')" id="nav-badges" class="flex flex-col items-center text-gray-400 hover:text-gray-200 transition">
-                <i class="fa-solid fa-trophy text-xl"></i>
-                <span class="text-xs font-bold mt-1">Huy hiệu</span>
-            </button>
-            <button onclick="switchTab('profile')" id="nav-profile" class="flex flex-col items-center text-gray-400 hover:text-gray-200 transition">
-                <i class="fa-solid fa-user text-xl"></i>
-                <span class="text-xs font-bold mt-1">Hồ sơ</span>
-            </button>
+    <!-- ỨNG DỤNG CHÍNH -->
+    <div id="app-shell" class="min-h-screen pb-24 hidden">
+
+        <!-- TOP HUD BAR -->
+        <header class="sticky top-0 z-50 bg-[#131f24]/95 backdrop-blur border-b border-gray-800 px-4 py-3">
+            <div class="max-w-4xl mx-auto flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-emerald-500 text-white font-black px-3 py-1 rounded-xl text-lg shadow-lg flex items-center gap-1">
+                        <i class="fa-solid fa-graduation-cap"></i> E6-9
+                    </div>
+                    <div>
+                        <h1 class="font-extrabold text-sm sm:text-base text-gray-200">English Quest</h1>
+                        <span id="hud-user-label" class="text-xs text-emerald-400 font-bold">Global Success + Modular Exam</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-3 sm:space-x-5 text-sm font-bold">
+                    <div class="flex items-center gap-2 bg-gray-800/80 px-3 py-1.5 rounded-full border border-gray-700">
+                        <span id="level-badge" class="bg-purple-600 text-white text-xs px-2 py-0.5 rounded-full">Lv.1</span>
+                        <div class="w-12 sm:w-20 bg-gray-700 h-2 rounded-full overflow-hidden">
+                            <div id="xp-bar" class="bg-purple-500 h-full w-0 transition-all duration-300"></div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-1 text-orange-400" title="Chuỗi ngày">
+                        <i class="fa-solid fa-fire"></i>
+                        <span id="streak-count">1</span>
+                    </div>
+
+                    <div class="flex items-center gap-1 text-yellow-400" title="Xu vàng">
+                        <i class="fa-solid fa-coins"></i>
+                        <span id="coins-count">60</span>
+                    </div>
+
+                    <div class="flex items-center gap-1 text-red-500" title="Tim">
+                        <i class="fa-solid fa-heart"></i>
+                        <span id="hearts-count">10</span>
+                    </div>
+
+                    <button onclick="toggleAudio()" id="audio-btn" class="text-gray-400 hover:text-white transition">
+                        <i class="fa-solid fa-volume-high text-lg"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- MAIN CONTAINER -->
+        <main class="max-w-4xl mx-auto px-4 mt-6">
+            
+            <!-- MAP VIEW -->
+            <div id="view-map-wrapper">
+                <div class="bg-[#202f36] p-4 rounded-2xl border border-gray-800 mb-6 space-y-3">
+                    <div class="flex flex-col sm:flex-row justify-between items-center gap-3">
+                        <div>
+                            <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-map-location-dot text-emerald-400"></i> Bản Đồ Chinh Phục
+                            </h2>
+                            <p class="text-xs text-gray-400">Hoàn thành đủ 4 chặng để mở khóa Unit tiếp theo</p>
+                        </div>
+                        <div class="flex flex-wrap gap-1.5 bg-gray-900/60 p-1.5 rounded-xl border border-gray-700 justify-center">
+                            <button onclick="switchGrade(6)" id="btn-grade-6" class="px-3 py-1 text-xs font-bold rounded-lg bg-gray-800 text-gray-300 transition">Lớp 6</button>
+                            <button onclick="switchGrade(7)" id="btn-grade-7" class="px-3 py-1 text-xs font-bold rounded-lg bg-gray-800 text-gray-300 transition">Lớp 7</button>
+                            <button onclick="switchGrade(8)" id="btn-grade-8" class="px-3 py-1 text-xs font-bold rounded-lg bg-gray-800 text-gray-300 transition">Lớp 8</button>
+                            <button onclick="switchGrade(9)" id="btn-grade-9" class="px-3 py-1 text-xs font-bold rounded-lg bg-emerald-600 text-white transition">Lớp 9</button>
+                            <button onclick="switchGrade('custom')" id="btn-grade-custom" class="px-3 py-1 text-xs font-bold rounded-lg bg-purple-700 text-white transition flex items-center gap-1">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> Đề Đã Tạo
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="semester-filter-bar" class="flex justify-between items-center pt-2 border-t border-gray-800">
+                        <div class="flex gap-2">
+                            <button onclick="filterSemester(1)" id="btn-sem-1" class="px-3 py-1.5 text-xs font-bold rounded-xl bg-emerald-600 text-white transition">Học kỳ I</button>
+                            <button onclick="filterSemester(2)" id="btn-sem-2" class="px-3 py-1.5 text-xs font-bold rounded-xl bg-gray-700 text-gray-300 transition">Học kỳ II</button>
+                        </div>
+                        <button onclick="switchTab('upload')" class="btn-duolingo bg-purple-600 hover:bg-purple-500 text-white px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5">
+                            <i class="fa-solid fa-plus-circle"></i> Tạo Đề & Quizz
+                        </button>
+                    </div>
+                </div>
+
+                <div id="view-map" class="space-y-6"></div>
+            </div>
+
+            <!-- MODULAR EXAM CREATOR + IN-TAB QUIZZ VIEW -->
+            <div id="view-upload" class="hidden space-y-6">
+                <div class="bg-[#202f36] p-6 rounded-2xl border border-gray-800 space-y-5">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div>
+                            <h2 class="text-xl font-black text-white flex items-center gap-2">
+                                <i class="fa-solid fa-layer-group text-purple-400"></i> Tạo Đề Theo Từng Phần & Làm Quizz
+                            </h2>
+                            <p class="text-xs text-gray-400 mt-1">
+                                Upload hoặc nhập riêng từng phần (Từ vựng, Câu hỏi đề, Ghép câu) và cung cấp <b>file đáp án riêng</b> để máy tự đối chiếu kết quả.
+                            </p>
+                        </div>
+                        <button onclick="fillModularSample()" class="px-3 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-purple-300 font-bold text-xs transition self-start">
+                            <i class="fa-solid fa-flask"></i> Nạp dữ liệu mẫu
+                        </button>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-300 mb-1">Tên bài học / Bộ đề:</label>
+                        <input type="text" id="mod-title" placeholder="Ví dụ: Đề ôn tập Tiếng Anh 9 - Phần 1" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:border-purple-500 focus:outline-none">
+                    </div>
+
+                    <div class="bg-gray-900/60 border border-gray-700/80 rounded-2xl p-4 space-y-2">
+                        <div class="flex items-center justify-between gap-2">
+                            <label class="text-xs font-extrabold text-emerald-400 uppercase">
+                                <i class="fa-solid fa-gem"></i> Phần 1: Từ Vựng (từ Anh - nghĩa Việt)
+                            </label>
+                            <label class="cursor-pointer bg-gray-800 hover:bg-gray-700 text-gray-200 text-[11px] font-bold px-3 py-1 rounded-lg border border-gray-600 transition">
+                                <i class="fa-solid fa-upload"></i> Upload file từ vựng
+                                <input type="file" accept="*" class="hidden" onchange="loadPartFile(event, 'mod-vocab')">
+                            </label>
+                        </div>
+                        <textarea id="mod-vocab" rows="3" placeholder="environment - môi trường&#10;pollution - sự ô nhiễm&#10;preserve - bảo tồn" class="w-full bg-gray-950 border border-gray-800 rounded-xl p-3 text-xs sm:text-sm text-white focus:border-emerald-500 focus:outline-none font-mono"></textarea>
+                    </div>
+
+                    <div class="bg-gray-900/60 border border-gray-700/80 rounded-2xl p-4 space-y-2">
+                        <div class="flex items-center justify-between gap-2">
+                            <label class="text-xs font-extrabold text-blue-400 uppercase">
+                                <i class="fa-solid fa-list-check"></i> Phần 2: Câu Hỏi Trắc Nghiệm (Đề)
+                            </label>
+                            <label class="cursor-pointer bg-gray-800 hover:bg-gray-700 text-gray-200 text-[11px] font-bold px-3 py-1 rounded-lg border border-gray-600 transition">
+                                <i class="fa-solid fa-upload"></i> Upload file đề câu hỏi
+                                <input type="file" accept="*" class="hidden" onchange="loadPartFile(event, 'mod-questions')">
+                            </label>
+                        </div>
+                        <textarea id="mod-questions" rows="6" placeholder="Câu 1: She _____ to school every day.&#10;A. go&#10;B. goes&#10;C. going&#10;D. went&#10;&#10;Câu 2: My brother is very _____ and helpful.&#10;A. kind&#10;B. lazily&#10;C. slow&#10;D. noise" class="w-full bg-gray-950 border border-gray-800 rounded-xl p-3 text-xs sm:text-sm text-white focus:border-blue-500 focus:outline-none font-mono"></textarea>
+                    </div>
+
+                    <div class="bg-gray-900/60 border border-gray-700/80 rounded-2xl p-4 space-y-2">
+                        <div class="flex items-center justify-between gap-2">
+                            <label class="text-xs font-extrabold text-yellow-400 uppercase">
+                                <i class="fa-solid fa-puzzle-piece"></i> Phần 3: Câu Hoàn Chỉnh Cho Ghép Câu
+                            </label>
+                            <label class="cursor-pointer bg-gray-800 hover:bg-gray-700 text-gray-200 text-[11px] font-bold px-3 py-1 rounded-lg border border-gray-600 transition">
+                                <i class="fa-solid fa-upload"></i> Upload file ghép câu
+                                <input type="file" accept="*" class="hidden" onchange="loadPartFile(event, 'mod-sentences')">
+                            </label>
+                        </div>
+                        <textarea id="mod-sentences" rows="2" placeholder="We should protect our environment.&#10;Students are learning English now." class="w-full bg-gray-950 border border-gray-800 rounded-xl p-3 text-xs sm:text-sm text-white focus:border-yellow-500 focus:outline-none font-mono"></textarea>
+                    </div>
+
+                    <div class="bg-purple-950/25 border border-purple-500/50 rounded-2xl p-4 space-y-2">
+                        <div class="flex items-center justify-between gap-2">
+                            <div>
+                                <label class="text-xs font-extrabold text-purple-300 uppercase">
+                                    <i class="fa-solid fa-key"></i> Phần 4: Đáp Án Riêng (Để Máy Tự Đối Chiếu)
+                                </label>
+                                <p class="text-[11px] text-gray-400">Hỗ trợ dạng <code class="text-purple-300">1.B, 2.A, 3.C</code> hoặc <code class="text-purple-300">1: goes, 2: kind</code> hoặc mỗi dòng 1 đáp án.</p>
+                            </div>
+                            <label class="cursor-pointer bg-purple-700 hover:bg-purple-600 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg transition shrink-0">
+                                <i class="fa-solid fa-file-circle-check"></i> Upload file đáp án
+                                <input type="file" accept="*" class="hidden" onchange="loadPartFile(event, 'mod-answers')">
+                            </label>
+                        </div>
+                        <textarea id="mod-answers" rows="3" placeholder="1.B  2.A  3.C&#10;Hoặc:&#10;Câu 1: goes&#10;Câu 2: kind" class="w-full bg-gray-950 border border-purple-800/60 rounded-xl p-3 text-xs sm:text-sm text-white focus:border-purple-400 focus:outline-none font-mono"></textarea>
+                    </div>
+
+                    <div id="mod-match-summary" class="hidden bg-gray-900 border border-emerald-500/40 rounded-xl p-3 text-xs text-emerald-300"></div>
+
+                    <div class="flex flex-col sm:flex-row gap-3 pt-1">
+                        <button onclick="startCreatorQuizz()" class="flex-1 btn-duolingo bg-purple-600 hover:bg-purple-500 text-white font-black py-3.5 rounded-2xl text-sm sm:text-base flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-gamepad"></i> Làm Quizz Ngay Tại Đây 🎯
+                        </button>
+                        <button onclick="saveModularUnitToMap()" class="flex-1 btn-duolingo bg-emerald-600 hover:bg-emerald-500 text-white font-black py-3.5 rounded-2xl text-sm sm:text-base flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-floppy-disk"></i> Lưu Thành Unit Vào Bản Đồ
+                        </button>
+                    </div>
+                </div>
+
+                <div id="creator-quizz-box" class="hidden bg-[#202f36] p-6 rounded-2xl border-2 border-purple-500/60 space-y-5">
+                    <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+                        <div>
+                            <span class="text-[11px] font-black text-purple-400 uppercase">Quizz Trong Phần Tạo Đề</span>
+                            <h3 id="quizz-progress-label" class="text-base font-black text-white">Câu 1/1</h3>
+                        </div>
+                        <div class="flex items-center gap-4 text-sm font-bold">
+                            <span class="text-emerald-400"><i class="fa-solid fa-check-circle"></i> Điểm: <span id="quizz-score">0</span></span>
+                            <button onclick="document.getElementById('creator-quizz-box').classList.add('hidden')" class="text-gray-400 hover:text-white text-xs">
+                                <i class="fa-solid fa-xmark"></i> Đóng Quizz
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="quizz-stage-body" class="space-y-4"></div>
+                </div>
+            </div>
+
+            <!-- SHOP VIEW -->
+            <div id="view-shop" class="hidden space-y-6">
+                <div class="bg-[#202f36] p-6 rounded-2xl border border-gray-800 text-center">
+                    <h2 class="text-2xl font-black text-white mb-2"><i class="fa-solid fa-store text-yellow-400"></i> Cửa Hàng Vật Phẩm</h2>
+                    <p class="text-sm text-gray-400">Dùng xu vàng kiếm được để hồi phục tim hoặc mua trợ giúp.</p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="game-card p-5 flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-2xl bg-red-500/20 text-red-500 flex items-center justify-center text-2xl font-bold">
+                                <i class="fa-solid fa-heart"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-white">Hồi Phục Đầy Tim</h3>
+                                <p class="text-xs text-gray-400">Khôi phục ngay lại 10 Tim ❤️</p>
+                            </div>
+                        </div>
+                        <button onclick="buyHearts()" class="btn-duolingo bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-extrabold px-4 py-2 rounded-xl text-sm flex items-center gap-1">
+                            <i class="fa-solid fa-coins"></i> 30
+                        </button>
+                    </div>
+                    <div class="game-card p-5 flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-2xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-2xl font-bold">
+                                <i class="fa-solid fa-shield-cat"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-white">Khiên Bảo Vệ Tim</h3>
+                                <p class="text-xs text-gray-400">Miễn nhiễm mất tim trong bài tiếp theo</p>
+                            </div>
+                        </div>
+                        <button onclick="buyShield()" class="btn-duolingo bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-extrabold px-4 py-2 rounded-xl text-sm flex items-center gap-1">
+                            <i class="fa-solid fa-coins"></i> 50
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BADGES VIEW -->
+            <div id="view-badges" class="hidden space-y-6">
+                <div class="bg-[#202f36] p-6 rounded-2xl border border-gray-800 text-center">
+                    <h2 class="text-2xl font-black text-white mb-2"><i class="fa-solid fa-trophy text-yellow-400"></i> Phòng Trưng bày Huy Hiệu</h2>
+                    <p class="text-sm text-gray-400">Chinh phục các Unit để sưu tầm huy hiệu danh giá.</p>
+                </div>
+                <div id="badges-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-4"></div>
+            </div>
+
+            <!-- PROFILE VIEW -->
+            <div id="view-profile" class="hidden space-y-6">
+                <div class="game-card p-6 text-center space-y-4">
+                    <div class="w-20 h-20 bg-emerald-500 rounded-full mx-auto flex items-center justify-center text-3xl font-black text-white shadow-xl" id="prof-avatar">
+                        E69
+                    </div>
+                    <div>
+                        <h2 id="prof-username" class="text-xl font-black text-white">Học Sinh Chăm Chỉ</h2>
+                        <p id="prof-email" class="text-xs text-emerald-400 font-bold">Chương trình Tiếng Anh THCS Global Success</p>
+                    </div>
+                    <div class="grid grid-cols-3 gap-3 pt-4 border-t border-gray-800 text-center">
+                        <div class="bg-gray-800/50 p-3 rounded-xl">
+                            <span id="prof-score" class="block text-xl font-black text-yellow-400">0</span>
+                            <span class="text-xs text-gray-400">Tổng XP</span>
+                        </div>
+                        <div class="bg-gray-800/50 p-3 rounded-xl">
+                            <span id="prof-hearts" class="block text-xl font-black text-red-500">10</span>
+                            <span class="text-xs text-gray-400">Tim hiện tại</span>
+                        </div>
+                        <div class="bg-gray-800/50 p-3 rounded-xl">
+                            <span id="prof-streak" class="block text-xl font-black text-orange-400">1</span>
+                            <span class="text-xs text-gray-400">Chuỗi ngày</span>
+                        </div>
+                    </div>
+                    <div class="flex justify-center gap-4 pt-2">
+                        <button onclick="logoutUser()" class="px-4 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-xs font-bold text-cyan-300 transition">
+                            <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất
+                        </button>
+                        <button onclick="resetData()" class="text-xs text-red-400 hover:text-red-300 underline px-2">Đặt lại tiến trình</button>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- LESSON MODAL -->
+        <div id="lesson-modal" class="fixed inset-0 z-50 bg-[#131f24] hidden flex flex-col">
+            <header class="bg-[#202f36] px-4 py-3 border-b border-gray-800 flex items-center justify-between">
+                <button onclick="closeLesson()" class="text-gray-400 hover:text-white text-lg px-2 py-1">
+                    <i class="fa-solid fa-xmark"></i> Thoát
+                </button>
+                <div class="w-1/2 bg-gray-700 h-3 rounded-full overflow-hidden">
+                    <div id="lesson-progress" class="bg-emerald-500 h-full w-0 transition-all duration-300"></div>
+                </div>
+                <div class="flex items-center gap-2 text-red-500 font-bold">
+                    <i class="fa-solid fa-heart"></i> <span id="modal-hearts">10</span>
+                </div>
+            </header>
+            <div id="lesson-content" class="flex-1 max-w-2xl w-full mx-auto p-4 flex flex-col justify-center overflow-y-auto"></div>
         </div>
-    </nav>
+
+        <!-- BOTTOM NAVIGATION -->
+        <nav class="fixed bottom-0 left-0 right-0 bg-[#131f24]/95 backdrop-blur border-t border-gray-800 py-2 z-40">
+            <div class="max-w-md mx-auto flex justify-around">
+                <button onclick="switchTab('map')" id="nav-map" class="flex flex-col items-center text-emerald-400 transition">
+                    <i class="fa-solid fa-map text-xl"></i>
+                    <span class="text-xs font-bold mt-1">Bản đồ</span>
+                </button>
+                <button onclick="switchTab('upload')" id="nav-upload" class="flex flex-col items-center text-gray-400 hover:text-gray-200 transition">
+                    <i class="fa-solid fa-layer-group text-xl"></i>
+                    <span class="text-xs font-bold mt-1">Tạo Đề</span>
+                </button>
+                <button onclick="switchTab('shop')" id="nav-shop" class="flex flex-col items-center text-gray-400 hover:text-gray-200 transition">
+                    <i class="fa-solid fa-store text-xl"></i>
+                    <span class="text-xs font-bold mt-1">Cửa hàng</span>
+                </button>
+                <button onclick="switchTab('badges')" id="nav-badges" class="flex flex-col items-center text-gray-400 hover:text-gray-200 transition">
+                    <i class="fa-solid fa-trophy text-xl"></i>
+                    <span class="text-xs font-bold mt-1">Huy hiệu</span>
+                </button>
+                <button onclick="switchTab('profile')" id="nav-profile" class="flex flex-col items-center text-gray-400 hover:text-gray-200 transition">
+                    <i class="fa-solid fa-user text-xl"></i>
+                    <span class="text-xs font-bold mt-1">Hồ sơ</span>
+                </button>
+            </div>
+        </nav>
+    </div>
 
     <script>
         if (window.pdfjsLib) {
             pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
         }
 
+        // =========================================================================
+        // HỆ THỐNG ĐĂNG NHẬP & ĐĂNG KÝ
+        // =========================================================================
+        const USERS_STORAGE_KEY = 'english69_users_v1';
+        const ACTIVE_USER_KEY = 'english69_active_user_v1';
+        let currentUserEmail = localStorage.getItem(ACTIVE_USER_KEY) || "";
+
+        function getUsersMap() {
+            return JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '{}');
+        }
+
+        function saveUsersMap(map) {
+            localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(map));
+        }
+
+        function toggleAuthMode(mode, event) {
+            if (event) event.preventDefault();
+            document.getElementById('login-msg').innerText = "";
+            document.getElementById('signup-msg').innerText = "";
+            if (mode === 'signup') {
+                document.getElementById('login-panel').style.display = 'none';
+                document.getElementById('signup-panel').style.display = 'block';
+            } else {
+                document.getElementById('signup-panel').style.display = 'none';
+                document.getElementById('login-panel').style.display = 'block';
+            }
+        }
+
+        function handleForgotPassword(event) {
+            event.preventDefault();
+            const email = document.getElementById('login-email').value.trim().toLowerCase();
+            const msgEl = document.getElementById('login-msg');
+            if (!email) {
+                msgEl.innerText = "Nhập Email trước để xem mật khẩu đã đăng ký.";
+                return;
+            }
+            const users = getUsersMap();
+            if (users[email]) {
+                msgEl.innerText = `Mật khẩu của ${email}: ${users[email].password}`;
+            } else {
+                msgEl.innerText = "Email chưa có tài khoản. Bấm Sign up để tạo mới.";
+            }
+        }
+
+        function handleSignupSubmit(event) {
+            event.preventDefault();
+            const username = document.getElementById('signup-name').value.trim();
+            const email = document.getElementById('signup-email').value.trim().toLowerCase();
+            const password = document.getElementById('signup-password').value;
+            const msgEl = document.getElementById('signup-msg');
+
+            const users = getUsersMap();
+            if (users[email]) {
+                msgEl.innerText = "Email này đã tồn tại! Hãy chuyển sang Login.";
+                return;
+            }
+
+            users[email] = { username, email, password };
+            saveUsersMap(users);
+            enterMainApp(email);
+        }
+
+        function handleLoginSubmit(event) {
+            event.preventDefault();
+            const email = document.getElementById('login-email').value.trim().toLowerCase();
+            const password = document.getElementById('login-password').value;
+            const msgEl = document.getElementById('login-msg');
+
+            const users = getUsersMap();
+            if (!users[email] || users[email].password !== password) {
+                msgEl.innerText = "Sai Email hoặc Password! (Nếu chưa có, bấm Sign up)";
+                return;
+            }
+
+            enterMainApp(email);
+        }
+
+        function enterMainApp(email) {
+            currentUserEmail = email;
+            localStorage.setItem(ACTIVE_USER_KEY, email);
+            document.getElementById('auth-screen').style.display = 'none';
+            document.getElementById('app-shell').classList.remove('hidden');
+
+            const users = getUsersMap();
+            const userInfo = users[email] || { username: "Học Sinh Chăm Chỉ", email };
+
+            gameState = loadUserGameState(email);
+            document.getElementById('hud-user-label').innerText = `${userInfo.username} • ${email}`;
+            document.getElementById('prof-username').innerText = userInfo.username;
+            document.getElementById('prof-email').innerText = email;
+            document.getElementById('prof-avatar').innerText = (userInfo.username || "E69").slice(0, 3).toUpperCase();
+
+            switchGrade(gameState.currentGrade || 9);
+            updateHUD();
+        }
+
+        function logoutUser() {
+            localStorage.removeItem(ACTIVE_USER_KEY);
+            currentUserEmail = "";
+            document.getElementById('app-shell').classList.add('hidden');
+            document.getElementById('auth-screen').style.display = 'flex';
+            toggleAuthMode('login');
+        }
+
+        // =========================================================================
+        // DỮ LIỆU SGK GLOBAL SUCCESS & TRẠNG THÁI THEO TÀI KHOẢN
+        // =========================================================================
         const generateUnits = (gradeName, titles) => {
             return titles.map((titleData, i) => ({
                 id: i + 1,
@@ -414,15 +740,26 @@
         const dataGrade8 = generateUnits("Lớp 8", titles8);
         const dataGrade9 = generateUnits("Lớp 9", titles9);
 
-        let gameState = JSON.parse(localStorage.getItem('english69_modular_v1')) || {
-            currentGrade: 9, level: 1, xp: 0, streak: 1, coins: 60, hearts: 10, maxHearts: 10, shield: false,
-            completedUnits: { 6: [], 7: [], 8: [], 9: [], custom: [] },
-            customUnits: [],
-            audioEnabled: true
-        };
+        function createDefaultState() {
+            return {
+                currentGrade: 9, level: 1, xp: 0, streak: 1, coins: 60, hearts: 10, maxHearts: 10, shield: false,
+                completedUnits: { 6: [], 7: [], 8: [], 9: [], custom: [] },
+                customUnits: [],
+                audioEnabled: true
+            };
+        }
+
+        function loadUserGameState(email) {
+            const raw = localStorage.getItem(`english69_state_${email}`);
+            return raw ? JSON.parse(raw) : createDefaultState();
+        }
+
+        let gameState = createDefaultState();
 
         function saveState() {
-            localStorage.setItem('english69_modular_v1', JSON.stringify(gameState));
+            if (currentUserEmail) {
+                localStorage.setItem(`english69_state_${currentUserEmail}`, JSON.stringify(gameState));
+            }
             updateHUD();
         }
 
@@ -521,12 +858,10 @@ D. leave`;
             updateAnswerMatchPreview();
         }
 
-        // Phân tích bảng đáp án riêng (hỗ trợ 1.A / 1-A / 1: B / hoặc giá trị đáp án trực tiếp)
         function parseSeparateAnswers(answerText) {
             const keyByNumber = {};
             const lines = answerText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
 
-            // Tìm các cặp số câu -> chữ cái A-D hoặc nội dung
             const pairRegex = /(?:câu|question)?\s*(\d{1,3})\s*[\.\-\:\)]\s*([A-Za-z0-9\s'-]+?)(?=(?:\s+(?:câu|question)?\s*\d{1,3}\s*[\.\-\:\)]|,|;|$))/gi;
             lines.forEach(line => {
                 const matches = [...line.matchAll(pairRegex)];
@@ -537,7 +872,6 @@ D. leave`;
                         if (val) keyByNumber[num] = val;
                     });
                 } else {
-                    // Nếu mỗi dòng là 1 đáp án đơn lẻ theo thứ tự 1, 2, 3...
                     const nextIdx = Object.keys(keyByNumber).length + 1;
                     keyByNumber[nextIdx] = line.replace(/[,;]+$/, '').trim();
                 }
@@ -554,7 +888,6 @@ D. leave`;
 
             const answerKeyMap = parseSeparateAnswers(ansRaw);
 
-            // 1. Từ vựng
             const vocabList = [];
             if (vocabRaw) {
                 vocabRaw.split(/\r?\n/).map(l => l.trim()).filter(Boolean).forEach(line => {
@@ -573,7 +906,6 @@ D. leave`;
                 vocabList.push({ en: "vocabulary", vi: "từ vựng", phonetic: "/vəˈkæbjələri/", example: "Practice vocabulary daily." });
             }
 
-            // 2. Câu hỏi + đối chiếu đáp án riêng
             const quizList = [];
             const lines = qRaw.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
             let currentQ = null;
@@ -587,13 +919,11 @@ D. leave`;
                         const idx = upper.charCodeAt(0) - 65;
                         if (qObj.options[idx]) return { text: qObj.options[idx], matched: true };
                     }
-                    // Nếu đáp án ghi chữ cái kèm dấu chấm (VD: "A.")
                     const letterMatch = upper.match(/^([A-D])\b/);
                     if (letterMatch) {
                         const idx = letterMatch[1].charCodeAt(0) - 65;
                         if (qObj.options[idx]) return { text: qObj.options[idx], matched: true };
                     }
-                    // Đối chiếu theo nội dung đáp án
                     const foundOpt = qObj.options.find(o => o.toLowerCase() === rawKey.toLowerCase());
                     if (foundOpt) return { text: foundOpt, matched: true };
                     return { text: rawKey, matched: true };
@@ -638,7 +968,6 @@ D. leave`;
             });
             pushQ();
 
-            // 3. Ghép câu
             const sentenceList = [];
             if (sRaw) {
                 sRaw.split(/\r?\n/).map(s => s.trim()).filter(Boolean).forEach(s => {
@@ -668,7 +997,6 @@ D. leave`;
             box.innerHTML = `<i class="fa-solid fa-link"></i> Đối chiếu đáp án: đã khớp <b>${matched}/${quizList.length}</b> câu hỏi với phần Đáp Án Riêng.`;
         }
 
-        // --- QUIZZ NGAY TRONG PHẦN TẠO ĐỀ ---
         let creatorQuizzItems = [];
         let creatorQuizzIdx = 0;
         let creatorQuizzScore = 0;
@@ -743,7 +1071,6 @@ D. leave`;
             }, 950);
         }
 
-        // Lưu thành Unit đầy đủ 4 chặng vào bản đồ (giữ nguyên hệ thống chính)
         function saveModularUnitToMap() {
             const { vocabList, quizList, sentenceList } = buildModularData();
             if (quizList.length === 0) {
@@ -783,7 +1110,7 @@ D. leave`;
         }
 
         // =========================================================================
-        // ĐIỀU HƯỚNG & GAMEPLAY GỐC
+        // ĐIỀU HƯỚNG & GAMEPLAY
         // =========================================================================
         let currentSemesterFilter = 1;
 
@@ -962,7 +1289,11 @@ D. leave`;
         }
 
         function resetData() {
-            if (confirm("Đặt lại toàn bộ tiến trình học?")) { localStorage.clear(); location.reload(); }
+            if (confirm("Đặt lại toàn bộ tiến trình học của tài khoản này?")) {
+                gameState = createDefaultState();
+                saveState();
+                location.reload();
+            }
         }
 
         function renderBadges() {
@@ -1201,7 +1532,10 @@ D. leave`;
                 </div>`;
         }
 
-        switchGrade(9);
+        // Khởi tạo: nếu đã đăng nhập trước đó thì vào thẳng app, chưa thì hiển thị Login/Sign up
+        if (currentUserEmail && getUsersMap()[currentUserEmail]) {
+            enterMainApp(currentUserEmail);
+        }
     </script>
 </body>
 </html>
