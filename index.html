@@ -12,7 +12,6 @@
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Eater&family=Sancreek&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        /* --- PHẦN CSS ĐĂNG NHẬP / ĐĂNG KÝ THEO MẪU CỦA BẠN --- */
         #auth-screen {
             position: fixed;
             inset: 0;
@@ -170,15 +169,10 @@
             min-height: 18px;
         }
         @keyframes animateBlink {
-            0% {
-                background: #0ef;
-            }
-            50% {
-                background: #2c4766;
-            }
+            0% { background: #0ef; }
+            50% { background: #2c4766; }
         }
 
-        /* --- PHẦN CSS ỨNG DỤNG CHÍNH --- */
         #app-shell {
             font-family: 'Nunito', sans-serif;
             background-color: #131f24;
@@ -204,7 +198,6 @@
     <!-- MÀN HÌNH ĐĂNG NHẬP & ĐĂNG KÝ -->
     <div id="auth-screen">
         <div class="container">
-            <!-- FORM LOGIN -->
             <div class="login-box" id="login-panel">
                 <h2>Login</h2>
                 <form id="login-form" onsubmit="handleLoginSubmit(event)">
@@ -227,7 +220,6 @@
                 </form>
             </div>
 
-            <!-- FORM SIGN UP -->
             <div class="login-box" id="signup-panel" style="display: none;">
                 <h2>Sign up</h2>
                 <form id="signup-form" onsubmit="handleSignupSubmit(event)">
@@ -245,7 +237,7 @@
                     </div>
                     <div class="input-box">
                         <input type="text" id="signup-code" class="code-input" placeholder=" " oninput="clearCodeError()">
-                        <label>Code</label>
+                        <label>Code </label>
                         <p id="signup-code-error" class="code-field-error"></p>
                     </div>
                     <button type="submit" class="btn">Create Account</button>
@@ -271,8 +263,6 @@
 
     <!-- ỨNG DỤNG CHÍNH -->
     <div id="app-shell" class="min-h-screen pb-24 hidden">
-
-        <!-- TOP HUD BAR -->
         <header class="sticky top-0 z-50 bg-[#131f24]/95 backdrop-blur border-b border-gray-800 px-4 py-3">
             <div class="max-w-4xl mx-auto flex items-center justify-between">
                 <div class="flex items-center space-x-3">
@@ -292,32 +282,15 @@
                             <div id="xp-bar" class="bg-purple-500 h-full w-0 transition-all duration-300"></div>
                         </div>
                     </div>
-
-                    <div class="flex items-center gap-1 text-orange-400" title="Chuỗi ngày">
-                        <i class="fa-solid fa-fire"></i>
-                        <span id="streak-count">1</span>
-                    </div>
-
-                    <div class="flex items-center gap-1 text-yellow-400" title="Xu vàng">
-                        <i class="fa-solid fa-coins"></i>
-                        <span id="coins-count">60</span>
-                    </div>
-
-                    <div class="flex items-center gap-1 text-red-500" title="Tim">
-                        <i class="fa-solid fa-heart"></i>
-                        <span id="hearts-count">10</span>
-                    </div>
-
-                    <button onclick="toggleAudio()" id="audio-btn" class="text-gray-400 hover:text-white transition">
-                        <i class="fa-solid fa-volume-high text-lg"></i>
-                    </button>
+                    <div class="flex items-center gap-1 text-orange-400" title="Chuỗi ngày"><i class="fa-solid fa-fire"></i><span id="streak-count">1</span></div>
+                    <div class="flex items-center gap-1 text-yellow-400" title="Xu vàng"><i class="fa-solid fa-coins"></i><span id="coins-count">60</span></div>
+                    <div class="flex items-center gap-1 text-red-500" title="Tim"><i class="fa-solid fa-heart"></i><span id="hearts-count">10</span></div>
+                    <button onclick="toggleAudio()" id="audio-btn" class="text-gray-400 hover:text-white transition"><i class="fa-solid fa-volume-high text-lg"></i></button>
                 </div>
             </div>
         </header>
 
-        <!-- MAIN CONTAINER -->
         <main class="max-w-4xl mx-auto px-4 mt-6">
-            
             <!-- MAP VIEW -->
             <div id="view-map-wrapper">
                 <div class="bg-[#202f36] p-4 rounded-2xl border border-gray-800 mb-6 space-y-3">
@@ -349,11 +322,10 @@
                         </button>
                     </div>
                 </div>
-
                 <div id="view-map" class="space-y-6"></div>
             </div>
 
-            <!-- MODULAR EXAM CREATOR + IN-TAB QUIZZ VIEW -->
+            <!-- UPLOAD / CREATOR VIEW -->
             <div id="view-upload" class="hidden space-y-6">
                 <div class="bg-[#202f36] p-6 rounded-2xl border border-gray-800 space-y-5">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
@@ -377,49 +349,41 @@
 
                     <div class="bg-gray-900/60 border border-gray-700/80 rounded-2xl p-4 space-y-2">
                         <div class="flex items-center justify-between gap-2">
-                            <label class="text-xs font-extrabold text-emerald-400 uppercase">
-                                <i class="fa-solid fa-gem"></i> Phần 1: Từ Vựng (từ Anh - nghĩa Việt)
-                            </label>
+                            <label class="text-xs font-extrabold text-emerald-400 uppercase"><i class="fa-solid fa-gem"></i> Phần 1: Từ Vựng (từ Anh - nghĩa Việt)</label>
                             <label class="cursor-pointer bg-gray-800 hover:bg-gray-700 text-gray-200 text-[11px] font-bold px-3 py-1 rounded-lg border border-gray-600 transition">
                                 <i class="fa-solid fa-upload"></i> Upload file từ vựng
                                 <input type="file" accept="*" class="hidden" onchange="loadPartFile(event, 'mod-vocab')">
                             </label>
                         </div>
-                        <textarea id="mod-vocab" rows="3" placeholder="environment - môi trường&#10;pollution - sự ô nhiễm&#10;preserve - bảo tồn" class="w-full bg-gray-950 border border-gray-800 rounded-xl p-3 text-xs sm:text-sm text-white focus:border-emerald-500 focus:outline-none font-mono"></textarea>
+                        <textarea id="mod-vocab" rows="3" class="w-full bg-gray-950 border border-gray-800 rounded-xl p-3 text-xs sm:text-sm text-white focus:border-emerald-500 focus:outline-none font-mono"></textarea>
                     </div>
 
                     <div class="bg-gray-900/60 border border-gray-700/80 rounded-2xl p-4 space-y-2">
                         <div class="flex items-center justify-between gap-2">
-                            <label class="text-xs font-extrabold text-blue-400 uppercase">
-                                <i class="fa-solid fa-list-check"></i> Phần 2: Câu Hỏi Trắc Nghiệm (Đề)
-                            </label>
+                            <label class="text-xs font-extrabold text-blue-400 uppercase"><i class="fa-solid fa-list-check"></i> Phần 2: Câu Hỏi Trắc Nghiệm (Đề)</label>
                             <label class="cursor-pointer bg-gray-800 hover:bg-gray-700 text-gray-200 text-[11px] font-bold px-3 py-1 rounded-lg border border-gray-600 transition">
                                 <i class="fa-solid fa-upload"></i> Upload file đề câu hỏi
                                 <input type="file" accept="*" class="hidden" onchange="loadPartFile(event, 'mod-questions')">
                             </label>
                         </div>
-                        <textarea id="mod-questions" rows="6" placeholder="Câu 1: She _____ to school every day.&#10;A. go&#10;B. goes&#10;C. going&#10;D. went&#10;&#10;Câu 2: My brother is very _____ and helpful.&#10;A. kind&#10;B. lazily&#10;C. slow&#10;D. noise" class="w-full bg-gray-950 border border-gray-800 rounded-xl p-3 text-xs sm:text-sm text-white focus:border-blue-500 focus:outline-none font-mono"></textarea>
+                        <textarea id="mod-questions" rows="6" class="w-full bg-gray-950 border border-gray-800 rounded-xl p-3 text-xs sm:text-sm text-white focus:border-blue-500 focus:outline-none font-mono"></textarea>
                     </div>
 
                     <div class="bg-gray-900/60 border border-gray-700/80 rounded-2xl p-4 space-y-2">
                         <div class="flex items-center justify-between gap-2">
-                            <label class="text-xs font-extrabold text-yellow-400 uppercase">
-                                <i class="fa-solid fa-puzzle-piece"></i> Phần 3: Câu Hoàn Chỉnh Cho Ghép Câu
-                            </label>
+                            <label class="text-xs font-extrabold text-yellow-400 uppercase"><i class="fa-solid fa-puzzle-piece"></i> Phần 3: Câu Hoàn Chỉnh Cho Ghép Câu</label>
                             <label class="cursor-pointer bg-gray-800 hover:bg-gray-700 text-gray-200 text-[11px] font-bold px-3 py-1 rounded-lg border border-gray-600 transition">
                                 <i class="fa-solid fa-upload"></i> Upload file ghép câu
                                 <input type="file" accept="*" class="hidden" onchange="loadPartFile(event, 'mod-sentences')">
                             </label>
                         </div>
-                        <textarea id="mod-sentences" rows="2" placeholder="We should protect our environment.&#10;Students are learning English now." class="w-full bg-gray-950 border border-gray-800 rounded-xl p-3 text-xs sm:text-sm text-white focus:border-yellow-500 focus:outline-none font-mono"></textarea>
+                        <textarea id="mod-sentences" rows="2" class="w-full bg-gray-950 border border-gray-800 rounded-xl p-3 text-xs sm:text-sm text-white focus:border-yellow-500 focus:outline-none font-mono"></textarea>
                     </div>
 
                     <div class="bg-purple-950/25 border border-purple-500/50 rounded-2xl p-4 space-y-2">
                         <div class="flex items-center justify-between gap-2">
                             <div>
-                                <label class="text-xs font-extrabold text-purple-300 uppercase">
-                                    <i class="fa-solid fa-key"></i> Phần 4: Đáp Án Riêng (Để Máy Tự Đối Chiếu)
-                                </label>
+                                <label class="text-xs font-extrabold text-purple-300 uppercase"><i class="fa-solid fa-key"></i> Phần 4: Đáp Án Riêng (Để Máy Tự Đối Chiếu)</label>
                                 <p class="text-[11px] text-gray-400">Hỗ trợ dạng <code class="text-purple-300">1.B, 2.A, 3.C</code> hoặc <code class="text-purple-300">1: goes, 2: kind</code> hoặc mỗi dòng 1 đáp án.</p>
                             </div>
                             <label class="cursor-pointer bg-purple-700 hover:bg-purple-600 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg transition shrink-0">
@@ -427,7 +391,7 @@
                                 <input type="file" accept="*" class="hidden" onchange="loadPartFile(event, 'mod-answers')">
                             </label>
                         </div>
-                        <textarea id="mod-answers" rows="3" placeholder="1.B  2.A  3.C&#10;Hoặc:&#10;Câu 1: goes&#10;Câu 2: kind" class="w-full bg-gray-950 border border-purple-800/60 rounded-xl p-3 text-xs sm:text-sm text-white focus:border-purple-400 focus:outline-none font-mono"></textarea>
+                        <textarea id="mod-answers" rows="3" class="w-full bg-gray-950 border border-purple-800/60 rounded-xl p-3 text-xs sm:text-sm text-white focus:border-purple-400 focus:outline-none font-mono"></textarea>
                     </div>
 
                     <div id="mod-match-summary" class="hidden bg-gray-900 border border-emerald-500/40 rounded-xl p-3 text-xs text-emerald-300"></div>
@@ -455,12 +419,11 @@
                             </button>
                         </div>
                     </div>
-
                     <div id="quizz-stage-body" class="space-y-4"></div>
                 </div>
             </div>
 
-            <!-- CLASSROOM VIEW (GIÁO VIÊN TẠO LỚP, THÊM BẰNG USER ID, TẶNG XU, SETUP THƯỞNG XU & GIAO BÀI) -->
+            <!-- CLASSROOM VIEW -->
             <div id="view-classes" class="hidden space-y-6">
                 <div id="teacher-create-class-card" class="hidden game-card p-6 space-y-4">
                     <div>
@@ -477,7 +440,6 @@
                         </button>
                     </div>
                 </div>
-
                 <div id="classes-list-container" class="space-y-5"></div>
             </div>
 
@@ -490,31 +452,23 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div class="game-card p-5 flex items-center justify-between">
                         <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-2xl bg-red-500/20 text-red-500 flex items-center justify-center text-2xl font-bold">
-                                <i class="fa-solid fa-heart"></i>
-                            </div>
+                            <div class="w-12 h-12 rounded-2xl bg-red-500/20 text-red-500 flex items-center justify-center text-2xl font-bold"><i class="fa-solid fa-heart"></i></div>
                             <div>
                                 <h3 class="font-bold text-white">Hồi Phục Đầy Tim</h3>
                                 <p class="text-xs text-gray-400">Khôi phục ngay lại 10 Tim ❤️</p>
                             </div>
                         </div>
-                        <button onclick="buyHearts()" class="btn-duolingo bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-extrabold px-4 py-2 rounded-xl text-sm flex items-center gap-1">
-                            <i class="fa-solid fa-coins"></i> 30
-                        </button>
+                        <button onclick="buyHearts()" class="btn-duolingo bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-extrabold px-4 py-2 rounded-xl text-sm flex items-center gap-1"><i class="fa-solid fa-coins"></i> 30</button>
                     </div>
                     <div class="game-card p-5 flex items-center justify-between">
                         <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-2xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-2xl font-bold">
-                                <i class="fa-solid fa-shield-cat"></i>
-                            </div>
+                            <div class="w-12 h-12 rounded-2xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-2xl font-bold"><i class="fa-solid fa-shield-cat"></i></div>
                             <div>
                                 <h3 class="font-bold text-white">Khiên Bảo Vệ Tim</h3>
                                 <p class="text-xs text-gray-400">Miễn nhiễm mất tim trong bài tiếp theo</p>
                             </div>
                         </div>
-                        <button onclick="buyShield()" class="btn-duolingo bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-extrabold px-4 py-2 rounded-xl text-sm flex items-center gap-1">
-                            <i class="fa-solid fa-coins"></i> 50
-                        </button>
+                        <button onclick="buyShield()" class="btn-duolingo bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-extrabold px-4 py-2 rounded-xl text-sm flex items-center gap-1"><i class="fa-solid fa-coins"></i> 50</button>
                     </div>
                 </div>
             </div>
@@ -531,9 +485,7 @@
             <!-- PROFILE VIEW -->
             <div id="view-profile" class="hidden space-y-6">
                 <div class="game-card p-6 text-center space-y-4">
-                    <div class="w-20 h-20 bg-emerald-500 rounded-full mx-auto flex items-center justify-center text-3xl font-black text-white shadow-xl" id="prof-avatar">
-                        E69
-                    </div>
+                    <div class="w-20 h-20 bg-emerald-500 rounded-full mx-auto flex items-center justify-center text-3xl font-black text-white shadow-xl" id="prof-avatar">E69</div>
                     <div>
                         <h2 id="prof-username" class="text-xl font-black text-white">Học Sinh Chăm Chỉ</h2>
                         <p id="prof-role-badge" class="inline-block mt-1 px-3 py-0.5 rounded-full text-xs font-extrabold bg-emerald-500/20 text-emerald-300">Học sinh</p>
@@ -541,42 +493,24 @@
                         <p id="prof-email" class="text-xs text-emerald-400 font-bold mt-1">Chương trình Tiếng Anh THCS Global Success</p>
                     </div>
                     <div class="grid grid-cols-3 gap-3 pt-4 border-t border-gray-800 text-center">
-                        <div class="bg-gray-800/50 p-3 rounded-xl">
-                            <span id="prof-score" class="block text-xl font-black text-yellow-400">0</span>
-                            <span class="text-xs text-gray-400">Tổng XP</span>
-                        </div>
-                        <div class="bg-gray-800/50 p-3 rounded-xl">
-                            <span id="prof-hearts" class="block text-xl font-black text-red-500">10</span>
-                            <span class="text-xs text-gray-400">Tim hiện tại</span>
-                        </div>
-                        <div class="bg-gray-800/50 p-3 rounded-xl">
-                            <span id="prof-streak" class="block text-xl font-black text-orange-400">1</span>
-                            <span class="text-xs text-gray-400">Chuỗi ngày</span>
-                        </div>
+                        <div class="bg-gray-800/50 p-3 rounded-xl"><span id="prof-score" class="block text-xl font-black text-yellow-400">0</span><span class="text-xs text-gray-400">Tổng XP</span></div>
+                        <div class="bg-gray-800/50 p-3 rounded-xl"><span id="prof-hearts" class="block text-xl font-black text-red-500">10</span><span class="text-xs text-gray-400">Tim hiện tại</span></div>
+                        <div class="bg-gray-800/50 p-3 rounded-xl"><span id="prof-streak" class="block text-xl font-black text-orange-400">1</span><span class="text-xs text-gray-400">Chuỗi ngày</span></div>
                     </div>
                     <div class="flex justify-center gap-4 pt-2">
-                        <button onclick="logoutUser()" class="px-4 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-xs font-bold text-cyan-300 transition">
-                            <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất
-                        </button>
+                        <button onclick="logoutUser()" class="px-4 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-xs font-bold text-cyan-300 transition"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</button>
                         <button onclick="resetData()" class="text-xs text-red-400 hover:text-red-300 underline px-2">Đặt lại tiến trình</button>
                     </div>
                 </div>
             </div>
-
         </main>
 
         <!-- LESSON MODAL -->
         <div id="lesson-modal" class="fixed inset-0 z-50 bg-[#131f24] hidden flex flex-col">
             <header class="bg-[#202f36] px-4 py-3 border-b border-gray-800 flex items-center justify-between">
-                <button onclick="closeLesson()" class="text-gray-400 hover:text-white text-lg px-2 py-1">
-                    <i class="fa-solid fa-xmark"></i> Thoát
-                </button>
-                <div class="w-1/2 bg-gray-700 h-3 rounded-full overflow-hidden">
-                    <div id="lesson-progress" class="bg-emerald-500 h-full w-0 transition-all duration-300"></div>
-                </div>
-                <div class="flex items-center gap-2 text-red-500 font-bold">
-                    <i class="fa-solid fa-heart"></i> <span id="modal-hearts">10</span>
-                </div>
+                <button onclick="closeLesson()" class="text-gray-400 hover:text-white text-lg px-2 py-1"><i class="fa-solid fa-xmark"></i> Thoát</button>
+                <div class="w-1/2 bg-gray-700 h-3 rounded-full overflow-hidden"><div id="lesson-progress" class="bg-emerald-500 h-full w-0 transition-all duration-300"></div></div>
+                <div class="flex items-center gap-2 text-red-500 font-bold"><i class="fa-solid fa-heart"></i> <span id="modal-hearts">10</span></div>
             </header>
             <div id="lesson-content" class="flex-1 max-w-2xl w-full mx-auto p-4 flex flex-col justify-center overflow-y-auto"></div>
         </div>
@@ -584,30 +518,12 @@
         <!-- BOTTOM NAVIGATION -->
         <nav class="fixed bottom-0 left-0 right-0 bg-[#131f24]/95 backdrop-blur border-t border-gray-800 py-2 z-40">
             <div class="max-w-lg mx-auto flex justify-around">
-                <button onclick="switchTab('map')" id="nav-map" class="flex flex-col items-center text-emerald-400 transition">
-                    <i class="fa-solid fa-map text-xl"></i>
-                    <span class="text-xs font-bold mt-1">Bản đồ</span>
-                </button>
-                <button onclick="switchTab('upload')" id="nav-upload" class="flex flex-col items-center text-gray-400 hover:text-gray-200 transition">
-                    <i class="fa-solid fa-layer-group text-xl"></i>
-                    <span class="text-xs font-bold mt-1">Tạo Đề</span>
-                </button>
-                <button onclick="switchTab('classes')" id="nav-classes" class="flex flex-col items-center text-gray-400 hover:text-gray-200 transition">
-                    <i class="fa-solid fa-chalkboard text-xl"></i>
-                    <span class="text-xs font-bold mt-1">Lớp học</span>
-                </button>
-                <button onclick="switchTab('shop')" id="nav-shop" class="flex flex-col items-center text-gray-400 hover:text-gray-200 transition">
-                    <i class="fa-solid fa-store text-xl"></i>
-                    <span class="text-xs font-bold mt-1">Cửa hàng</span>
-                </button>
-                <button onclick="switchTab('badges')" id="nav-badges" class="flex flex-col items-center text-gray-400 hover:text-gray-200 transition">
-                    <i class="fa-solid fa-trophy text-xl"></i>
-                    <span class="text-xs font-bold mt-1">Huy hiệu</span>
-                </button>
-                <button onclick="switchTab('profile')" id="nav-profile" class="flex flex-col items-center text-gray-400 hover:text-gray-200 transition">
-                    <i class="fa-solid fa-user text-xl"></i>
-                    <span class="text-xs font-bold mt-1">Hồ sơ</span>
-                </button>
+                <button onclick="switchTab('map')" id="nav-map" class="flex flex-col items-center text-emerald-400 transition"><i class="fa-solid fa-map text-xl"></i><span class="text-xs font-bold mt-1">Bản đồ</span></button>
+                <button onclick="switchTab('upload')" id="nav-upload" class="flex flex-col items-center text-gray-400 hover:text-gray-200 transition"><i class="fa-solid fa-layer-group text-xl"></i><span class="text-xs font-bold mt-1">Tạo Đề</span></button>
+                <button onclick="switchTab('classes')" id="nav-classes" class="flex flex-col items-center text-gray-400 hover:text-gray-200 transition"><i class="fa-solid fa-chalkboard text-xl"></i><span class="text-xs font-bold mt-1">Lớp học</span></button>
+                <button onclick="switchTab('shop')" id="nav-shop" class="flex flex-col items-center text-gray-400 hover:text-gray-200 transition"><i class="fa-solid fa-store text-xl"></i><span class="text-xs font-bold mt-1">Cửa hàng</span></button>
+                <button onclick="switchTab('badges')" id="nav-badges" class="flex flex-col items-center text-gray-400 hover:text-gray-200 transition"><i class="fa-solid fa-trophy text-xl"></i><span class="text-xs font-bold mt-1">Huy hiệu</span></button>
+                <button onclick="switchTab('profile')" id="nav-profile" class="flex flex-col items-center text-gray-400 hover:text-gray-200 transition"><i class="fa-solid fa-user text-xl"></i><span class="text-xs font-bold mt-1">Hồ sơ</span></button>
             </div>
         </nav>
     </div>
@@ -618,13 +534,25 @@
         }
 
         // =========================================================================
-        // HỆ THỐNG ĐĂNG NHẬP, ĐĂNG KÝ, USER ID & QUYỀN GIÁO VIÊN (E69)
+        // CHUẨN HÓA EMAIL (1 GMAIL = 1 TÀI KHOẢN) & ĐĂNG NHẬP / ĐĂNG KÝ
         // =========================================================================
         const USERS_STORAGE_KEY = 'english69_users_v1';
         const ACTIVE_USER_KEY = 'english69_active_user_v1';
         const CLASSES_STORAGE_KEY = 'english69_classes_v1';
-        let currentUserEmail = localStorage.getItem(ACTIVE_USER_KEY) || "";
+        let currentUserEmail = "";
         let activeAssignmentContext = null;
+
+        function normalizeEmailKey(rawEmail) {
+            const clean = (rawEmail || "").trim().toLowerCase();
+            const parts = clean.split("@");
+            if (parts.length !== 2) return clean;
+            let [local, domain] = parts;
+            if (domain === "googlemail.com") domain = "gmail.com";
+            if (domain === "gmail.com") {
+                local = local.split("+")[0].replace(/\./g, "");
+            }
+            return `${local}@${domain}`;
+        }
 
         function generateUserId() {
             const rand = Math.floor(1000 + Math.random() * 9000);
@@ -632,25 +560,38 @@
         }
 
         function getUsersMap() {
-            const map = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '{}');
+            const rawMap = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '{}');
+            const normalizedMap = {};
             let changed = false;
-            Object.keys(map).forEach(email => {
-                if (!map[email].userId) {
-                    map[email].userId = generateUserId();
+
+            Object.entries(rawMap).forEach(([k, u]) => {
+                const canonKey = normalizeEmailKey(u.email || k);
+                if (canonKey !== k) changed = true;
+                if (!u.userId) {
+                    u.userId = generateUserId();
                     changed = true;
                 }
-                if (!map[email].role) {
-                    map[email].role = "Học sinh";
+                if (!u.role) {
+                    u.role = "Học sinh";
+                    changed = true;
+                }
+                u.email = canonKey;
+                if (!normalizedMap[canonKey]) {
+                    normalizedMap[canonKey] = u;
+                } else {
                     changed = true;
                 }
             });
-            if (changed) saveUsersMap(map);
-            return map;
+
+            if (changed) saveUsersMap(normalizedMap);
+            return normalizedMap;
         }
 
         function saveUsersMap(map) {
             localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(map));
         }
+
+        currentUserEmail = normalizeEmailKey(localStorage.getItem(ACTIVE_USER_KEY) || "");
 
         function getClassesList() {
             return JSON.parse(localStorage.getItem(CLASSES_STORAGE_KEY) || '[]');
@@ -662,7 +603,7 @@
 
         function getCurrentUserInfo() {
             const users = getUsersMap();
-            return users[currentUserEmail] || null;
+            return users[normalizeEmailKey(currentUserEmail)] || null;
         }
 
         function isTeacherAccount() {
@@ -693,24 +634,24 @@
 
         function handleForgotPassword(event) {
             event.preventDefault();
-            const email = document.getElementById('login-email').value.trim().toLowerCase();
+            const emailKey = normalizeEmailKey(document.getElementById('login-email').value);
             const msgEl = document.getElementById('login-msg');
-            if (!email) {
+            if (!emailKey) {
                 msgEl.innerText = "Nhập Email trước để xem mật khẩu đã đăng ký.";
                 return;
             }
             const users = getUsersMap();
-            if (users[email]) {
-                msgEl.innerText = `Mật khẩu của ${email}: ${users[email].password}`;
+            if (users[emailKey]) {
+                msgEl.innerText = `Mật khẩu của ${emailKey}: ${users[emailKey].password}`;
             } else {
-                msgEl.innerText = "Email chưa có tài khoản. Bấm Sign up để tạo mới.";
+                msgEl.innerText = "Email chưa có tài khoản trên trình duyệt này. Bấm Sign up để tạo mới.";
             }
         }
 
         function handleSignupSubmit(event) {
             event.preventDefault();
             const username = document.getElementById('signup-name').value.trim();
-            const email = document.getElementById('signup-email').value.trim().toLowerCase();
+            const emailKey = normalizeEmailKey(document.getElementById('signup-email').value);
             const password = document.getElementById('signup-password').value;
             const rawCode = document.getElementById('signup-code').value.trim();
 
@@ -732,43 +673,48 @@
             }
 
             const users = getUsersMap();
-            if (users[email]) {
-                msgEl.innerText = "Email này đã tồn tại! Hãy chuyển sang Login.";
+            if (users[emailKey]) {
+                msgEl.innerText = `Gmail ${emailKey} đã có tài khoản! Mỗi Gmail chỉ được tạo 1 tài khoản.`;
                 return;
             }
 
             const userId = generateUserId();
-            users[email] = { userId, username, email, password, role };
+            users[emailKey] = { userId, username, email: emailKey, password, role };
             saveUsersMap(users);
-            enterMainApp(email);
+            enterMainApp(emailKey);
         }
 
         function handleLoginSubmit(event) {
             event.preventDefault();
-            const email = document.getElementById('login-email').value.trim().toLowerCase();
+            const emailKey = normalizeEmailKey(document.getElementById('login-email').value);
             const password = document.getElementById('login-password').value;
             const msgEl = document.getElementById('login-msg');
 
             const users = getUsersMap();
-            if (!users[email] || users[email].password !== password) {
-                msgEl.innerText = "Sai Email hoặc Password! (Nếu chưa có, bấm Sign up)";
+            if (!users[emailKey]) {
+                msgEl.innerText = "Tài khoản chưa tồn tại trên trình duyệt này! Hãy bấm Sign up.";
+                return;
+            }
+            if (users[emailKey].password !== password) {
+                msgEl.innerText = "Sai mật khẩu! Vui lòng kiểm tra lại.";
                 return;
             }
 
-            enterMainApp(email);
+            enterMainApp(emailKey);
         }
 
         function enterMainApp(email) {
-            currentUserEmail = email;
-            localStorage.setItem(ACTIVE_USER_KEY, email);
+            const canonEmail = normalizeEmailKey(email);
+            currentUserEmail = canonEmail;
+            localStorage.setItem(ACTIVE_USER_KEY, canonEmail);
             document.getElementById('auth-screen').style.display = 'none';
             document.getElementById('app-shell').classList.remove('hidden');
 
             const users = getUsersMap();
-            const userInfo = users[email] || { userId: generateUserId(), username: "Học Sinh Chăm Chỉ", email, role: "Học sinh" };
+            const userInfo = users[canonEmail] || { userId: generateUserId(), username: "Học Sinh Chăm Chỉ", email: canonEmail, role: "Học sinh" };
             const role = userInfo.role || "Học sinh";
 
-            gameState = loadUserGameState(email);
+            gameState = loadUserGameState(canonEmail);
             document.getElementById('hud-user-label').innerText = `${userInfo.username} (${role}) • ${userInfo.userId}`;
             document.getElementById('prof-username').innerText = userInfo.username;
             document.getElementById('prof-userid').innerText = userInfo.userId;
@@ -776,7 +722,7 @@
             document.getElementById('prof-role-badge').className = role === "Giáo viên"
                 ? "inline-block mt-1 px-3 py-0.5 rounded-full text-xs font-extrabold bg-purple-500/20 text-purple-300"
                 : "inline-block mt-1 px-3 py-0.5 rounded-full text-xs font-extrabold bg-emerald-500/20 text-emerald-300";
-            document.getElementById('prof-email').innerText = email;
+            document.getElementById('prof-email').innerText = canonEmail;
             document.getElementById('prof-avatar').innerText = role === "Giáo viên" ? "GV" : (userInfo.username || "E69").slice(0, 3).toUpperCase();
 
             const mapSub = document.getElementById('map-subtitle');
@@ -895,7 +841,7 @@
             const [studentEmail, studentInfo] = studentEntry;
             const stState = loadUserGameState(studentEmail);
             stState.coins = (stState.coins || 0) + amount;
-            localStorage.setItem(`english69_state_${studentEmail}`, JSON.stringify(stState));
+            localStorage.setItem(`english69_state_${normalizeEmailKey(studentEmail)}`, JSON.stringify(stState));
 
             amountEl.value = "";
             renderClassesView();
@@ -1053,7 +999,7 @@
             }
 
             const visibleClasses = isTeacher
-                ? allClasses.filter(c => c.teacherEmail === user.email)
+                ? allClasses.filter(c => normalizeEmailKey(c.teacherEmail) === normalizeEmailKey(user.email))
                 : allClasses.filter(c => (c.studentIds || []).includes(user.userId));
 
             listContainer.innerHTML = "";
@@ -1118,41 +1064,28 @@
 
                 const teacherControlsHtml = isTeacher ? `
                     <div class="pt-3 border-t border-gray-800 space-y-4">
-                        <!-- Thêm học sinh bằng User ID -->
                         <div class="space-y-1.5">
-                            <label class="block text-xs font-extrabold text-cyan-300">
-                                <i class="fa-solid fa-user-plus"></i> Thêm học sinh bằng User ID:
-                            </label>
+                            <label class="block text-xs font-extrabold text-cyan-300"><i class="fa-solid fa-user-plus"></i> Thêm học sinh bằng User ID:</label>
                             <div class="flex flex-col sm:flex-row gap-2">
                                 <input type="text" id="add-student-input-${cls.id}" placeholder="Nhập User ID học sinh (VD: USR-1234)" class="flex-1 bg-gray-900 border border-gray-700 rounded-xl px-3.5 py-2 text-xs sm:text-sm text-white font-mono focus:border-cyan-400 focus:outline-none">
-                                <button onclick="addStudentToClassById('${cls.id}')" class="btn-duolingo bg-cyan-500 hover:bg-cyan-400 text-gray-950 font-black px-4 py-2 rounded-xl text-xs shrink-0">
-                                    Thêm vào lớp
-                                </button>
+                                <button onclick="addStudentToClassById('${cls.id}')" class="btn-duolingo bg-cyan-500 hover:bg-cyan-400 text-gray-950 font-black px-4 py-2 rounded-xl text-xs shrink-0">Thêm vào lớp</button>
                             </div>
                         </div>
 
-                        <!-- Tặng xu vàng trực tiếp cho học sinh -->
                         <div class="bg-yellow-950/20 border border-yellow-500/30 rounded-xl p-3.5 space-y-2">
-                            <label class="block text-xs font-extrabold text-yellow-300">
-                                <i class="fa-solid fa-coins"></i> Tặng xu vàng cho học sinh (Vô hạn xu giáo viên):
-                            </label>
+                            <label class="block text-xs font-extrabold text-yellow-300"><i class="fa-solid fa-coins"></i> Tặng xu vàng cho học sinh (Vô hạn xu giáo viên):</label>
                             <div class="flex flex-col sm:flex-row gap-2">
                                 <select id="gift-student-select-${cls.id}" class="flex-1 bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:border-yellow-400 focus:outline-none">
                                     <option value="">-- Chọn học sinh --</option>
                                     ${studentSelectOptions}
                                 </select>
                                 <input type="number" id="gift-coins-amount-${cls.id}" min="1" placeholder="Số xu tặng" class="w-full sm:w-32 bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white font-mono focus:border-yellow-400 focus:outline-none">
-                                <button onclick="giftCoinsToStudent('${cls.id}')" class="btn-duolingo bg-yellow-500 hover:bg-yellow-400 text-gray-950 font-black px-4 py-2 rounded-xl text-xs shrink-0">
-                                    Tặng Xu
-                                </button>
+                                <button onclick="giftCoinsToStudent('${cls.id}')" class="btn-duolingo bg-yellow-500 hover:bg-yellow-400 text-gray-950 font-black px-4 py-2 rounded-xl text-xs shrink-0">Tặng Xu</button>
                             </div>
                         </div>
 
-                        <!-- Giao bài & Setup thưởng xu khi hoàn thành -->
                         <div class="bg-gray-900/60 border border-gray-700/70 rounded-xl p-3.5 space-y-2.5">
-                            <label class="block text-xs font-extrabold text-emerald-400">
-                                <i class="fa-solid fa-file-circle-plus"></i> Giao bài & Setup phần thưởng xu khi hoàn thành:
-                            </label>
+                            <label class="block text-xs font-extrabold text-emerald-400"><i class="fa-solid fa-file-circle-plus"></i> Giao bài & Setup phần thưởng xu khi hoàn thành:</label>
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
                                 <input type="text" id="assign-title-${cls.id}" placeholder="Tên bài giao (VD: Bài tập Unit 1)" class="bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:border-emerald-500 focus:outline-none">
                                 <select id="assign-custom-select-${cls.id}" class="bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-gray-200 focus:border-emerald-500 focus:outline-none">
@@ -1167,9 +1100,7 @@
                             </div>
                             <textarea id="assign-q-${cls.id}" rows="3" placeholder="Nhập nhanh câu hỏi (nếu không chọn Đề Đã Tạo):&#10;Câu 1: She _____ to school every day.&#10;A. go&#10;B. goes&#10;C. going&#10;D. went" class="w-full bg-gray-950 border border-gray-800 rounded-xl p-2.5 text-xs text-white font-mono focus:border-emerald-500 focus:outline-none"></textarea>
                             <input type="text" id="assign-ans-${cls.id}" placeholder="Đáp án đối chiếu (VD: 1.B)" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white font-mono focus:border-emerald-500 focus:outline-none">
-                            <button onclick="assignWorkToClass('${cls.id}')" class="btn-duolingo bg-emerald-600 hover:bg-emerald-500 text-white font-black px-4 py-2 rounded-xl text-xs">
-                                <i class="fa-solid fa-paper-plane"></i> Giao Bài & Lưu Thưởng Xu
-                            </button>
+                            <button onclick="assignWorkToClass('${cls.id}')" class="btn-duolingo bg-emerald-600 hover:bg-emerald-500 text-white font-black px-4 py-2 rounded-xl text-xs"><i class="fa-solid fa-paper-plane"></i> Giao Bài & Lưu Thưởng Xu</button>
                         </div>
                     </div>
                 ` : "";
@@ -1182,21 +1113,10 @@
                             <span class="text-[11px] font-bold text-purple-400">GV: ${cls.teacherName} (${cls.teacherId || ""})</span>
                             <h3 class="text-lg font-black text-white">${cls.name}</h3>
                         </div>
-                        <span class="px-3 py-1 rounded-full bg-gray-800 text-xs font-bold text-gray-300">
-                            ${(cls.studentIds || []).length} học sinh • ${(cls.assignments || []).length} bài giao
-                        </span>
+                        <span class="px-3 py-1 rounded-full bg-gray-800 text-xs font-bold text-gray-300">${(cls.studentIds || []).length} học sinh • ${(cls.assignments || []).length} bài giao</span>
                     </div>
-
-                    <div class="space-y-1.5">
-                        <p class="text-xs font-bold text-gray-400">Danh sách học sinh trong lớp:</p>
-                        ${membersHtml}
-                    </div>
-
-                    <div class="space-y-2">
-                        <p class="text-xs font-bold text-gray-400">Bài tập đã giao:</p>
-                        ${assignmentsHtml}
-                    </div>
-
+                    <div class="space-y-1.5"><p class="text-xs font-bold text-gray-400">Danh sách học sinh trong lớp:</p>${membersHtml}</div>
+                    <div class="space-y-2"><p class="text-xs font-bold text-gray-400">Bài tập đã giao:</p>${assignmentsHtml}</div>
                     ${teacherControlsHtml}
                 `;
                 listContainer.appendChild(card);
@@ -1282,7 +1202,8 @@
         }
 
         function loadUserGameState(email) {
-            const raw = localStorage.getItem(`english69_state_${email}`);
+            const canon = normalizeEmailKey(email);
+            const raw = localStorage.getItem(`english69_state_${canon}`) || localStorage.getItem(`english69_state_${email}`);
             return raw ? JSON.parse(raw) : createDefaultState();
         }
 
@@ -1290,7 +1211,7 @@
 
         function saveState() {
             if (currentUserEmail) {
-                localStorage.setItem(`english69_state_${currentUserEmail}`, JSON.stringify(gameState));
+                localStorage.setItem(`english69_state_${normalizeEmailKey(currentUserEmail)}`, JSON.stringify(gameState));
             }
             updateHUD();
         }
@@ -1559,9 +1480,7 @@ D. leave`;
                         <div class="text-4xl text-yellow-400"><i class="fa-solid fa-award"></i></div>
                         <h4 class="text-xl font-black text-white">Hoàn Thành Quizz!</h4>
                         <p class="text-sm text-gray-300">Bạn trả lời đúng <b class="text-emerald-400">${creatorQuizzScore}/${creatorQuizzItems.length}</b> câu theo đáp án đã đối chiếu.</p>
-                        <button onclick="startCreatorQuizz()" class="btn-duolingo bg-purple-600 hover:bg-purple-500 text-white font-bold px-5 py-2.5 rounded-xl text-sm">
-                            Làm lại Quizz này
-                        </button>
+                        <button onclick="startCreatorQuizz()" class="btn-duolingo bg-purple-600 hover:bg-purple-500 text-white font-bold px-5 py-2.5 rounded-xl text-sm">Làm lại Quizz này</button>
                     </div>`;
                 return;
             }
@@ -1620,10 +1539,7 @@ D. leave`;
                 vietnamese: `${vocabList.length} từ vựng • ${quizList.length} câu hỏi • ${sentenceList.length} câu ghép`,
                 semester: 1,
                 vocab: vocabList,
-                grammar: {
-                    title: `Tổng hợp: ${title}`,
-                    content: "Bài học được tạo từ các phần bạn đã tải lên và đối chiếu đáp án riêng."
-                },
+                grammar: { title: `Tổng hợp: ${title}`, content: "Bài học được tạo từ các phần bạn đã tải lên và đối chiếu đáp án riêng." },
                 quiz: quizList,
                 sentences: sentenceList,
                 boss: { name: `Boss: ${title}`, hp: 100, questions: quizList.length }
@@ -1666,11 +1582,8 @@ D. leave`;
             });
 
             const semBar = document.getElementById('semester-filter-bar');
-            if (grade === 'custom') {
-                semBar.classList.add('hidden');
-            } else {
-                semBar.classList.remove('hidden');
-            }
+            if (grade === 'custom') semBar.classList.add('hidden');
+            else semBar.classList.remove('hidden');
 
             saveState();
             renderMap();
@@ -1701,14 +1614,10 @@ D. leave`;
             if (gameState.currentGrade === 'custom' && units.length === 0) {
                 mapContainer.innerHTML = `
                     <div class="game-card p-8 text-center space-y-4">
-                        <div class="w-16 h-16 bg-purple-500/20 text-purple-400 rounded-full mx-auto flex items-center justify-center text-3xl">
-                            <i class="fa-solid fa-layer-group"></i>
-                        </div>
+                        <div class="w-16 h-16 bg-purple-500/20 text-purple-400 rounded-full mx-auto flex items-center justify-center text-3xl"><i class="fa-solid fa-layer-group"></i></div>
                         <h3 class="text-lg font-black text-white">Chưa có đề tự tạo nào</h3>
                         <p class="text-xs text-gray-400 max-w-md mx-auto">Vào tab Tạo Đề để upload từng phần đề, cung cấp file đáp án riêng và làm Quizz ngay!</p>
-                        <button onclick="switchTab('upload')" class="btn-duolingo bg-purple-600 hover:bg-purple-500 text-white font-bold px-6 py-3 rounded-xl text-sm">
-                            + Mở Trình Tạo Đề & Quizz
-                        </button>
+                        <button onclick="switchTab('upload')" class="btn-duolingo bg-purple-600 hover:bg-purple-500 text-white font-bold px-6 py-3 rounded-xl text-sm">+ Mở Trình Tạo Đề & Quizz</button>
                     </div>`;
                 return;
             }
@@ -1724,7 +1633,6 @@ D. leave`;
 
                 const card = document.createElement('div');
                 card.className = `game-card p-5 relative overflow-hidden transition ${!isUnlocked ? 'opacity-60 bg-[#18242a]' : 'bg-[#202f36]'}`;
-                
                 card.innerHTML = `
                     <div class="flex justify-between items-start mb-4">
                         <div class="flex items-center gap-3">
@@ -1732,9 +1640,7 @@ D. leave`;
                                 ${isCompleted ? '<i class="fa-solid fa-check"></i>' : (isUnlocked ? unit.id : '<i class="fa-solid fa-lock"></i>')}
                             </div>
                             <div>
-                                <span class="text-xs font-bold ${isUnlocked ? 'text-emerald-400' : 'text-gray-400'}">
-                                    ${gameState.currentGrade === 'custom' ? 'ĐỀ TỰ TẠO' : `LỚP ${gameState.currentGrade} • HK${unit.semester}`}
-                                </span>
+                                <span class="text-xs font-bold ${isUnlocked ? 'text-emerald-400' : 'text-gray-400'}">${gameState.currentGrade === 'custom' ? 'ĐỀ TỰ TẠO' : `LỚP ${gameState.currentGrade} • HK${unit.semester}`}</span>
                                 <h3 class="text-base sm:text-lg font-black text-white">${unit.title}</h3>
                                 <p class="text-xs text-gray-400">${unit.vietnamese}</p>
                             </div>
@@ -1750,31 +1656,19 @@ D. leave`;
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-3 border-t border-gray-800/80">
                         <button onclick="${isUnlocked ? `startStage(${unit.id}, 1)` : 'lockedAlert()'}" class="p-2.5 rounded-xl text-left bg-gray-800/60 hover:bg-gray-800 transition flex items-center gap-2">
                             <i class="fa-solid fa-gem text-emerald-400"></i>
-                            <div class="overflow-hidden">
-                                <p class="text-xs font-bold text-white truncate">1. Từ Vựng</p>
-                                <span class="text-[10px] text-gray-400">${unit.vocab.length} thẻ</span>
-                            </div>
+                            <div class="overflow-hidden"><p class="text-xs font-bold text-white truncate">1. Từ Vựng</p><span class="text-[10px] text-gray-400">${unit.vocab.length} thẻ</span></div>
                         </button>
                         <button onclick="${isUnlocked ? `startStage(${unit.id}, 2)` : 'lockedAlert()'}" class="p-2.5 rounded-xl text-left bg-gray-800/60 hover:bg-gray-800 transition flex items-center gap-2">
                             <i class="fa-solid fa-book-open text-blue-400"></i>
-                            <div class="overflow-hidden">
-                                <p class="text-xs font-bold text-white truncate">2. Trắc Nghiệm</p>
-                                <span class="text-[10px] text-gray-400">${unit.quiz.length} câu</span>
-                            </div>
+                            <div class="overflow-hidden"><p class="text-xs font-bold text-white truncate">2. Trắc Nghiệm</p><span class="text-[10px] text-gray-400">${unit.quiz.length} câu</span></div>
                         </button>
                         <button onclick="${isUnlocked ? `startStage(${unit.id}, 3)` : 'lockedAlert()'}" class="p-2.5 rounded-xl text-left bg-gray-800/60 hover:bg-gray-800 transition flex items-center gap-2">
                             <i class="fa-solid fa-puzzle-piece text-yellow-400"></i>
-                            <div class="overflow-hidden">
-                                <p class="text-xs font-bold text-white truncate">3. Ghép Câu</p>
-                                <span class="text-[10px] text-gray-400">${unit.sentences.length} câu</span>
-                            </div>
+                            <div class="overflow-hidden"><p class="text-xs font-bold text-white truncate">3. Ghép Câu</p><span class="text-[10px] text-gray-400">${unit.sentences.length} câu</span></div>
                         </button>
                         <button onclick="${isUnlocked ? `startStage(${unit.id}, 4)` : 'lockedAlert()'}" class="p-2.5 rounded-xl text-left bg-gray-800/60 hover:bg-gray-800 transition flex items-center gap-2">
                             <i class="fa-solid fa-dragon text-red-400"></i>
-                            <div class="overflow-hidden">
-                                <p class="text-xs font-bold text-white truncate">4. Đấu Boss</p>
-                                <span class="text-[10px] text-gray-400">Tổng hợp</span>
-                            </div>
+                            <div class="overflow-hidden"><p class="text-xs font-bold text-white truncate">4. Đấu Boss</p><span class="text-[10px] text-gray-400">Tổng hợp</span></div>
                         </button>
                     </div>
                 `;
@@ -1805,25 +1699,15 @@ D. leave`;
         }
 
         function buyHearts() {
-            if (isTeacherAccount()) {
-                alert("👑 Tài khoản Giáo viên đã có vô hạn tim ❤️!");
-                return;
-            }
-            if (gameState.coins >= 30) {
-                gameState.coins -= 30; gameState.hearts = 10; saveState();
-                alert("Đã hồi phục thành công 10 Tim! ❤️");
-            } else { alert("Bạn không đủ xu vàng!"); }
+            if (isTeacherAccount()) { alert("👑 Tài khoản Giáo viên đã có vô hạn tim ❤️!"); return; }
+            if (gameState.coins >= 30) { gameState.coins -= 30; gameState.hearts = 10; saveState(); alert("Đã hồi phục thành công 10 Tim! ❤️"); }
+            else { alert("Bạn không đủ xu vàng!"); }
         }
 
         function buyShield() {
-            if (isTeacherAccount()) {
-                alert("👑 Tài khoản Giáo viên đã có vô hạn tim ❤️, không cần mua khiên!");
-                return;
-            }
-            if (gameState.coins >= 50) {
-                gameState.coins -= 50; gameState.shield = true; saveState();
-                alert("Đã mua Khiên bảo vệ tim thành công! 🛡️");
-            } else { alert("Bạn không đủ xu vàng!"); }
+            if (isTeacherAccount()) { alert("👑 Tài khoản Giáo viên đã có vô hạn tim ❤️, không cần mua khiên!"); return; }
+            if (gameState.coins >= 50) { gameState.coins -= 50; gameState.shield = true; saveState(); alert("Đã mua Khiên bảo vệ tim thành công! 🛡️"); }
+            else { alert("Bạn không đủ xu vàng!"); }
         }
 
         function updateProfileStats() {
@@ -1852,9 +1736,7 @@ D. leave`;
                 const item = document.createElement('div');
                 item.className = `game-card p-4 text-center ${earned ? 'border-yellow-500/50 bg-yellow-500/10' : 'opacity-40'}`;
                 item.innerHTML = `
-                    <div class="w-16 h-16 mx-auto mb-2 rounded-2xl ${earned ? 'bg-yellow-500 text-gray-900' : 'bg-gray-800 text-gray-500'} flex items-center justify-center text-3xl shadow">
-                        <i class="fa-solid fa-medal"></i>
-                    </div>
+                    <div class="w-16 h-16 mx-auto mb-2 rounded-2xl ${earned ? 'bg-yellow-500 text-gray-900' : 'bg-gray-800 text-gray-500'} flex items-center justify-center text-3xl shadow"><i class="fa-solid fa-medal"></i></div>
                     <h4 class="font-bold text-white text-sm">${u.title}</h4>
                     <p class="text-[11px] text-gray-400">${earned ? 'Đã đạt huy hiệu' : 'Chưa mở khóa'}</p>
                 `;
@@ -1880,9 +1762,7 @@ D. leave`;
         }
 
         function loseHeart() {
-            if (isTeacherAccount()) {
-                return;
-            }
+            if (isTeacherAccount()) return;
             if (gameState.shield) { gameState.shield = false; alert("🛡️ Khiên bảo vệ đã đỡ 1 lần mất tim!"); return; }
             if (gameState.hearts > 0) { gameState.hearts--; heartsLostInThisLesson++; saveState(); }
             if (gameState.hearts <= 0) {
@@ -2002,12 +1882,8 @@ D. leave`;
                 <div class="space-y-6">
                     <span class="text-xs font-bold text-yellow-400 uppercase">Chặng 3: Ghép câu</span>
                     <h3 class="text-lg font-black text-white">Sắp xếp các từ thành câu đúng:</h3>
-                    <div id="selected-words-box" class="min-h-[60px] bg-[#202f36] border-2 border-dashed border-gray-600 rounded-2xl p-3 flex flex-wrap gap-2 items-center">
-                        <span class="text-xs text-gray-500 italic">Chạm vào từ bên dưới...</span>
-                    </div>
-                    <div id="pool-words-box" class="flex flex-wrap gap-2 pt-2">
-                        ${currentScrambled.map((w, idx) => `<button onclick="pickWord('${w.replace(/'/g, "\\'")}', ${idx})" id="pool-word-${idx}" class="btn-duolingo bg-gray-800 border border-gray-600 px-4 py-2 rounded-xl font-bold text-white text-sm">${w}</button>`).join('')}
-                    </div>
+                    <div id="selected-words-box" class="min-h-[60px] bg-[#202f36] border-2 border-dashed border-gray-600 rounded-2xl p-3 flex flex-wrap gap-2 items-center"><span class="text-xs text-gray-500 italic">Chạm vào từ bên dưới...</span></div>
+                    <div id="pool-words-box" class="flex flex-wrap gap-2 pt-2">${currentScrambled.map((w, idx) => `<button onclick="pickWord('${w.replace(/'/g, "\\'")}', ${idx})" id="pool-word-${idx}" class="btn-duolingo bg-gray-800 border border-gray-600 px-4 py-2 rounded-xl font-bold text-white text-sm">${w}</button>`).join('')}</div>
                     <button onclick="checkSentenceResult('${sentenceObj.correct.replace(/'/g, "\\'")}')" class="btn-duolingo w-full bg-emerald-600 text-white font-black py-3.5 rounded-2xl text-lg">Kiểm tra ➔</button>
                 </div>`;
         }
@@ -2020,11 +1896,8 @@ D. leave`;
 
         function updateSelectedWordsBox() {
             const box = document.getElementById('selected-words-box');
-            if (userSelectedWords.length === 0) {
-                box.innerHTML = `<span class="text-xs text-gray-500 italic">Chạm vào từ bên dưới...</span>`;
-            } else {
-                box.innerHTML = userSelectedWords.map((item, sIdx) => `<button onclick="returnWord(${sIdx}, ${item.idx})" class="btn-duolingo bg-emerald-600 px-3 py-1.5 rounded-xl font-bold text-white text-sm">${item.word}</button>`).join('');
-            }
+            if (userSelectedWords.length === 0) box.innerHTML = `<span class="text-xs text-gray-500 italic">Chạm vào từ bên dưới...</span>`;
+            else box.innerHTML = userSelectedWords.map((item, sIdx) => `<button onclick="returnWord(${sIdx}, ${item.idx})" class="btn-duolingo bg-emerald-600 px-3 py-1.5 rounded-xl font-bold text-white text-sm">${item.word}</button>`).join('');
         }
 
         function returnWord(selectedIdx, poolIdx) {
@@ -2038,20 +1911,14 @@ D. leave`;
             const cleanUser = userSentence.replace(/[.!?]$/, "").toLowerCase();
             const cleanCorrect = correctSentence.replace(/[.!?]$/, "").toLowerCase();
 
-            if (cleanUser === cleanCorrect) {
-                alert("Chính xác! 🎉"); lessonStep++; loadStageContent();
-            } else {
-                loseHeart(); if (!isTeacherAccount() && gameState.hearts <= 0) return;
-                alert("❌ Chưa đúng! Hãy suy nghĩ và sắp xếp lại nhé.");
-            }
+            if (cleanUser === cleanCorrect) { alert("Chính xác! 🎉"); lessonStep++; loadStageContent(); }
+            else { loseHeart(); if (!isTeacherAccount() && gameState.hearts <= 0) return; alert("❌ Chưa đúng! Hãy suy nghĩ và sắp xếp lại nhé."); }
         }
 
         function finishStageReward() {
             const teacherMode = isTeacherAccount();
             gameState.xp += 25;
-            if (!teacherMode) {
-                gameState.coins += 10;
-            }
+            if (!teacherMode) gameState.coins += 10;
             let bonusText = "";
             if (!teacherMode && heartsLostInThisLesson === 0) {
                 gameState.hearts = Math.min(gameState.maxHearts, gameState.hearts + 1);
@@ -2063,7 +1930,6 @@ D. leave`;
                 bonusText += `<br><span class='text-purple-400 font-bold'>🚀 Lên Cấp độ ${gameState.level}!</span>`;
             }
 
-            // Cộng phần thưởng xu do giáo viên setup khi hoàn thành bài giao
             if (activeAssignmentContext) {
                 const user = getCurrentUserInfo();
                 const classes = getClassesList();
@@ -2075,9 +1941,7 @@ D. leave`;
                     if (reward > 0 && !cls.completedByStudents[claimKey]) {
                         cls.completedByStudents[claimKey] = true;
                         saveClassesList(classes);
-                        if (!teacherMode) {
-                            gameState.coins += reward;
-                        }
+                        if (!teacherMode) gameState.coins += reward;
                         bonusText += `<br><span class='text-yellow-300 font-extrabold'>🎁 Phần thưởng hoàn thành bài của giáo viên: +${reward} Xu Vàng 🪙!</span>`;
                     }
                 }
@@ -2095,9 +1959,7 @@ D. leave`;
 
             document.getElementById('lesson-content').innerHTML = `
                 <div class="text-center space-y-6">
-                    <div class="w-24 h-24 bg-yellow-500 rounded-full mx-auto flex items-center justify-center text-4xl text-gray-900 shadow-xl animate-bounce">
-                        <i class="fa-solid fa-trophy"></i>
-                    </div>
+                    <div class="w-24 h-24 bg-yellow-500 rounded-full mx-auto flex items-center justify-center text-4xl text-gray-900 shadow-xl animate-bounce"><i class="fa-solid fa-trophy"></i></div>
                     <div>
                         <h2 class="text-2xl font-black text-white">Hoàn Thành Xuất Sắc Chặng Này!</h2>
                         <p class="text-sm text-emerald-400 mt-1">${currentUnitObj.title}</p>
