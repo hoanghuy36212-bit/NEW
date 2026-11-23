@@ -647,8 +647,54 @@
                         </div>
                     </div>
 
-                    <div class="flex justify-center gap-4 pt-2">
+                    <div class="flex flex-wrap justify-center gap-3 pt-2">
+                        <button onclick="switchTab('settings')" class="px-5 py-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-xs font-bold text-emerald-300 transition"><i class="fa-solid fa-gear"></i> Cài đặt</button>
                         <button onclick="logoutUser()" class="px-5 py-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-xs font-bold text-cyan-300 transition"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SETTINGS VIEW (SAU PHẦN HỒ SƠ) -->
+            <div id="view-settings" class="hidden space-y-6">
+                <div class="game-card p-6 space-y-5">
+                    <div>
+                        <h2 class="text-xl font-black text-white flex items-center gap-2">
+                            <i class="fa-solid fa-gear text-emerald-400"></i> Cài Đặt Hệ Thống
+                        </h2>
+                        <p class="text-xs text-gray-400 mt-1">Tùy chỉnh thiết lập ứng dụng và các công cụ quản trị.</p>
+                    </div>
+
+                    <div class="bg-gray-900/70 border border-gray-800 rounded-2xl p-4 flex items-center justify-between gap-3">
+                        <div>
+                            <h3 class="text-sm font-extrabold text-white">Âm thanh phát âm tiếng Anh</h3>
+                            <p class="text-xs text-gray-400">Tự động đọc từ vựng khi học thẻ từ mới.</p>
+                        </div>
+                        <button onclick="toggleAudio()" class="px-4 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-xs font-bold text-emerald-300 transition shrink-0">
+                            <i class="fa-solid fa-volume-high mr-1"></i> Bật / Tắt âm
+                        </button>
+                    </div>
+
+                    <div id="admin-danger-zone" class="hidden bg-red-950/30 border-2 border-red-500/50 rounded-2xl p-5 space-y-3">
+                        <div>
+                            <span class="text-[11px] font-black uppercase text-red-400"><i class="fa-solid fa-shield-halved"></i> Chỉ dành cho ADMIN</span>
+                            <h3 class="text-base font-black text-white mt-0.5">Xóa Toàn Bộ Tiến Trình Và Dữ Liệu Người Dùng</h3>
+                            <p class="text-xs text-red-200/85 mt-1">
+                                Hành động này sẽ xóa vĩnh viễn toàn bộ tài khoản người dùng, tiến trình XP/Level/tim/xu/đề tự tạo, lớp học, theo dõi và bảng tin lưu trên trình duyệt này.
+                            </p>
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-extrabold text-red-300">Nhập <span class="font-mono bg-red-900/60 px-1.5 py-0.5 rounded text-white">XOA TAT CA</span> để xác nhận:</label>
+                            <input type="text" id="admin-wipe-confirm-input" placeholder="Nhập XOA TAT CA..." class="w-full bg-gray-950 border border-red-700/70 rounded-xl px-3.5 py-2 text-xs sm:text-sm text-white font-mono focus:border-red-400 focus:outline-none">
+                        </div>
+
+                        <button onclick="adminWipeAllUsersAndProgress()" class="btn-duolingo bg-red-600 hover:bg-red-500 text-white font-black px-5 py-3 rounded-xl text-xs sm:text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-trash-can"></i> Xóa Toàn Bộ Tiến Trình & Dữ Liệu Người Dùng
+                        </button>
+                    </div>
+
+                    <div id="non-admin-settings-note" class="bg-gray-900/50 border border-gray-800 rounded-2xl p-4 text-xs text-gray-400">
+                        <i class="fa-solid fa-lock text-gray-500 mr-1"></i> Tính năng <b>Xóa toàn bộ tiến trình và dữ liệu người dùng</b> chỉ khả dụng cho tài khoản <b>ADMIN</b>.
                     </div>
                 </div>
             </div>
@@ -676,7 +722,7 @@
 
         <!-- BOTTOM NAVIGATION -->
         <nav class="fixed bottom-0 left-0 right-0 bg-[#131f24]/95 backdrop-blur border-t border-gray-800 py-2 z-40">
-            <div class="max-w-3xl mx-auto flex justify-around">
+            <div class="max-w-4xl mx-auto flex justify-around">
                 <button onclick="switchTab('map')" id="nav-map" class="flex flex-col items-center text-emerald-400 transition"><i class="fa-solid fa-map text-lg"></i><span class="text-[11px] font-bold mt-1">Bản đồ</span></button>
                 <button onclick="switchTab('upload')" id="nav-upload" class="flex flex-col items-center text-gray-400 hover:text-gray-200 transition"><i class="fa-solid fa-layer-group text-lg"></i><span class="text-[11px] font-bold mt-1">Tạo Đề</span></button>
                 <button onclick="switchTab('classes')" id="nav-classes" class="flex flex-col items-center text-gray-400 hover:text-gray-200 transition"><i class="fa-solid fa-chalkboard text-lg"></i><span class="text-[11px] font-bold mt-1">Lớp học</span></button>
@@ -685,6 +731,7 @@
                 <button onclick="switchTab('social')" id="nav-social" class="flex flex-col items-center text-gray-400 hover:text-gray-200 transition"><i class="fa-solid fa-newspaper text-lg"></i><span class="text-[11px] font-bold mt-1">Bảng tin</span></button>
                 <button onclick="switchTab('badges')" id="nav-badges" class="flex flex-col items-center text-gray-400 hover:text-gray-200 transition"><i class="fa-solid fa-trophy text-lg"></i><span class="text-[11px] font-bold mt-1">Huy hiệu</span></button>
                 <button onclick="switchTab('profile')" id="nav-profile" class="flex flex-col items-center text-gray-400 hover:text-gray-200 transition"><i class="fa-solid fa-user text-lg"></i><span class="text-[11px] font-bold mt-1">Hồ sơ</span></button>
+                <button onclick="switchTab('settings')" id="nav-settings" class="flex flex-col items-center text-gray-400 hover:text-gray-200 transition"><i class="fa-solid fa-gear text-lg"></i><span class="text-[11px] font-bold mt-1">Cài đặt</span></button>
             </div>
         </nav>
     </div>
@@ -795,6 +842,52 @@
         function isTeacherAccount() {
             const u = getCurrentUserInfo();
             return Boolean(u && (u.role === "Giáo viên" || u.role === "Admin"));
+        }
+
+        function syncSettingsRoleUI() {
+            const isAdm = isAdminAccount();
+            const dangerZone = document.getElementById('admin-danger-zone');
+            const nonAdminNote = document.getElementById('non-admin-settings-note');
+            if (dangerZone) {
+                if (isAdm) dangerZone.classList.remove('hidden');
+                else dangerZone.classList.add('hidden');
+            }
+            if (nonAdminNote) {
+                if (isAdm) nonAdminNote.classList.add('hidden');
+                else nonAdminNote.classList.remove('hidden');
+            }
+        }
+
+        function adminWipeAllUsersAndProgress() {
+            if (!isAdminAccount()) {
+                alert("❌ Chỉ tài khoản ADMIN mới có quyền xóa toàn bộ tiến trình và dữ liệu người dùng!");
+                return;
+            }
+            const confirmInput = document.getElementById('admin-wipe-confirm-input');
+            const typed = (confirmInput && confirmInput.value ? confirmInput.value : "").trim().toUpperCase();
+            if (typed !== "XOA TAT CA") {
+                alert("⚠️ Vui lòng nhập chính xác chữ XOA TAT CA vào ô xác nhận trước khi xóa!");
+                if (confirmInput) confirmInput.focus();
+                return;
+            }
+            if (!confirm("Xác nhận lần cuối: Xóa TOÀN BỘ tài khoản người dùng, tiến trình và dữ liệu hệ thống?")) {
+                return;
+            }
+
+            const keysToRemove = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const k = localStorage.key(i);
+                if (k && k.startsWith("english69_")) {
+                    keysToRemove.push(k);
+                }
+            }
+            keysToRemove.forEach(k => localStorage.removeItem(k));
+
+            currentUserEmail = "";
+            gameState = createDefaultState();
+            if (confirmInput) confirmInput.value = "";
+            alert("🗑️ Đã xóa toàn bộ tiến trình và dữ liệu người dùng!");
+            logoutUser();
         }
 
         function clearCodeError() {
@@ -941,6 +1034,8 @@
                 if (isAdm) adminXpCard.classList.remove('hidden');
                 else adminXpCard.classList.add('hidden');
             }
+
+            syncSettingsRoleUI();
 
             const mapSub = document.getElementById('map-subtitle');
             if (mapSub) {
@@ -2413,7 +2508,7 @@ D. leave`;
         }
 
         function switchTab(tab) {
-            ['map', 'upload', 'classes', 'shop', 'leaderboard', 'social', 'badges', 'profile'].forEach(t => {
+            ['map', 'upload', 'classes', 'shop', 'leaderboard', 'social', 'badges', 'profile', 'settings'].forEach(t => {
                 const viewEl = t === 'map' ? document.getElementById('view-map-wrapper') : document.getElementById(`view-${t}`);
                 const navEl = document.getElementById(`nav-${t}`);
                 if (viewEl) viewEl.classList.add('hidden');
@@ -2431,6 +2526,7 @@ D. leave`;
             if (tab === 'social') renderSocialView();
             if (tab === 'badges') renderBadges();
             if (tab === 'profile') updateProfileStats();
+            if (tab === 'settings') syncSettingsRoleUI();
         }
 
         function buyHearts() {
