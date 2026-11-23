@@ -450,7 +450,7 @@
             <div id="view-shop" class="hidden space-y-6">
                 <div class="bg-[#202f36] p-6 rounded-2xl border border-gray-800 text-center">
                     <h2 class="text-2xl font-black text-white mb-2"><i class="fa-solid fa-store text-yellow-400"></i> Cửa Hàng Vật Phẩm</h2>
-                    <p id="shop-subtitle" class="text-sm text-gray-400">Mua vật phẩm có thời hạn sẽ cộng dồn thêm 15 phút sử dụng.</p>
+                    <p id="shop-subtitle" class="text-sm text-gray-400">Cộng dồn thời gian dùng vật phẩm chỉ dành cho Giáo viên và Admin.</p>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -460,8 +460,8 @@
                                 <i class="fa-solid fa-infinity"></i>
                             </div>
                             <div>
-                                <h3 class="font-bold text-white">Vô Hạn Trái Tim (+15 phút)</h3>
-                                <p class="text-xs text-gray-400">Không mất tim khi trả lời sai • Cộng dồn thời gian ❤️</p>
+                                <h3 class="font-bold text-white">Vô Hạn Trái Tim (15 phút)</h3>
+                                <p class="text-xs text-gray-400">Không mất tim khi trả lời sai ❤️</p>
                                 <span id="shop-inf-hearts-status" class="text-[11px] font-bold text-red-300"></span>
                             </div>
                         </div>
@@ -476,8 +476,8 @@
                                 x2
                             </div>
                             <div>
-                                <h3 class="font-bold text-white">x2 Kinh Nghiệm (+15 phút)</h3>
-                                <p class="text-xs text-gray-400">Nhân đôi XP nhận được • Cộng dồn thời gian ⚡</p>
+                                <h3 class="font-bold text-white">x2 Kinh Nghiệm (15 phút)</h3>
+                                <p class="text-xs text-gray-400">Nhân đôi XP nhận được ⚡</p>
                                 <span id="shop-xp2-status" class="text-[11px] font-bold text-purple-300"></span>
                             </div>
                         </div>
@@ -492,8 +492,8 @@
                                 x3
                             </div>
                             <div>
-                                <h3 class="font-bold text-white">x3 Kinh Nghiệm (+15 phút)</h3>
-                                <p class="text-xs text-gray-400">Nhân ba XP nhận được • Cộng dồn thời gian 🔥</p>
+                                <h3 class="font-bold text-white">x3 Kinh Nghiệm (15 phút)</h3>
+                                <p class="text-xs text-gray-400">Nhân ba XP nhận được 🔥</p>
                                 <span id="shop-xp3-status" class="text-[11px] font-bold text-amber-300"></span>
                             </div>
                         </div>
@@ -1234,7 +1234,7 @@
         }
 
         // =========================================================================
-        // VẬT PHẨM CÓ THỜI HẠN (CỘNG DỒN THỜI GIAN DÙNG KHI MUA TIẾP)
+        // VẬT PHẨM CÓ THỜI HẠN (CỘNG DỒN THỜI GIAN DÙNG CHỈ CHO GIÁO VIÊN & ADMIN)
         // =========================================================================
         function getBoostRemainingMs(type, now = Date.now()) {
             const b = gameState.boosts || {};
@@ -1279,7 +1279,7 @@
             if (shopSub) {
                 shopSub.innerText = teacherMode
                     ? "Quyền Giáo viên & Admin: Mua vật phẩm có thời hạn sẽ cộng dồn thêm 15 phút."
-                    : "Mua vật phẩm có thời hạn sẽ cộng dồn thêm 15 phút vào thời gian còn lại.";
+                    : "Cộng dồn thời gian dùng chỉ dành cho Giáo viên và Admin. Học sinh mua khi đang chạy sẽ không cộng dồn.";
             }
 
             items.forEach(it => {
@@ -1289,21 +1289,40 @@
                 const statusEl = document.getElementById(it.statusId);
 
                 if (statusEl) {
-                    statusEl.innerText = isRunning
-                        ? `Đang hoạt động • Cộng dồn còn: ${formatRemaining(rem)}`
-                        : "Chưa kích hoạt (+15 phút mỗi lần mua)";
+                    if (isRunning) {
+                        statusEl.innerText = teacherMode
+                            ? `Đang hoạt động • Còn: ${formatRemaining(rem)} (mua tiếp để cộng dồn)`
+                            : `Đang hoạt động • Còn: ${formatRemaining(rem)} (không cộng dồn)`;
+                    } else {
+                        statusEl.innerText = teacherMode
+                            ? "Chưa kích hoạt (Giáo viên/Admin mua được cộng dồn +15p)"
+                            : "Chưa kích hoạt (Thời hạn 15 phút)";
+                    }
                 }
 
                 if (btn) {
-                    btn.disabled = false;
-                    btn.className = "btn-duolingo bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-extrabold px-4 py-2 rounded-xl text-sm flex items-center gap-1 shrink-0";
-                    btn.innerHTML = `<i class="fa-solid fa-coins"></i> ${it.cost}${teacherMode ? ' <span class="text-[10px] font-black">(∞)</span>' : ' <span class="text-[10px] font-black">(+15p)</span>'}`;
+                    const lockedForStudent = !teacherMode && isRunning;
+                    btn.disabled = lockedForStudent;
+                    if (lockedForStudent) {
+                        btn.className = "bg-gray-700 text-gray-300 font-extrabold px-4 py-2 rounded-xl text-sm flex items-center gap-1 shrink-0 cursor-not-allowed opacity-80";
+                        btn.innerHTML = `<i class="fa-solid fa-clock"></i> Đang chạy`;
+                    } else {
+                        btn.className = "btn-duolingo bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-extrabold px-4 py-2 rounded-xl text-sm flex items-center gap-1 shrink-0";
+                        btn.innerHTML = `<i class="fa-solid fa-coins"></i> ${it.cost}${teacherMode ? ' <span class="text-[10px] font-black">(+15p)</span>' : ''}`;
+                    }
                 }
             });
         }
 
         function buyTimedBoost(type, cost, minutes) {
             const teacherMode = isTeacherAccount();
+            const now = Date.now();
+            const rem = getBoostRemainingMs(type, now);
+
+            if (!teacherMode && rem > 0) {
+                alert(`⏳ Vật phẩm này đang còn ${formatRemaining(rem)}! Tính năng cộng dồn thời gian chỉ dành cho Giáo viên và Admin.`);
+                return;
+            }
 
             if (!teacherMode && gameState.coins < cost) {
                 alert(`❌ Bạn không đủ ${cost} xu vàng để mua vật phẩm này!`);
@@ -1315,20 +1334,20 @@
             }
 
             gameState.boosts = gameState.boosts || {};
-            const now = Date.now();
             const key = `${type}Until`;
-            const baseTime = Math.max(now, Number(gameState.boosts[key] || 0));
+            const baseTime = teacherMode ? Math.max(now, Number(gameState.boosts[key] || 0)) : now;
             const newUntil = baseTime + minutes * 60 * 1000;
             gameState.boosts[key] = newUntil;
             saveState();
 
             const totalRemaining = formatRemaining(newUntil - Date.now());
+            const modeNote = teacherMode ? ` (Đã cộng dồn, tổng còn: ${totalRemaining})` : ` (Hiệu lực ${minutes} phút)`;
             if (type === 'infHearts') {
-                alert(`❤️ Đã cộng dồn +${minutes} phút Vô hạn trái tim! Tổng còn lại: ${totalRemaining}`);
+                alert(`❤️ Đã kích hoạt Vô hạn trái tim!${modeNote}`);
             } else if (type === 'xp2') {
-                alert(`⚡ Đã cộng dồn +${minutes} phút x2 Kinh nghiệm! Tổng còn lại: ${totalRemaining}`);
+                alert(`⚡ Đã kích hoạt x2 Kinh nghiệm!${modeNote}`);
             } else if (type === 'xp3') {
-                alert(`🔥 Đã cộng dồn +${minutes} phút x3 Kinh nghiệm! Tổng còn lại: ${totalRemaining}`);
+                alert(`🔥 Đã kích hoạt x3 Kinh nghiệm!${modeNote}`);
             }
         }
 
