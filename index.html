@@ -182,7 +182,7 @@
         .game-card { background: #202f36; border: 2px solid #374151; border-radius: 1rem; transition: all 0.2s; }
         .game-card:hover { border-color: #4b5563; }
         .btn-duolingo { transition: all 0.1s ease; box-shadow: 0 4px 0 0 rgba(0,0,0,0.3); }
-        .btn-duolingo:active { transform: translateY(4px); box-shadow: 0 0 0 0 rgba(0,0,0,0.3); }
+        .btn-duolingo:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 0 0 0 rgba(0,0,0,0.3); }
         .flip-card { perspective: 1000px; }
         .flip-card-inner { transition: transform 0.6s; transform-style: preserve-3d; }
         .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
@@ -446,11 +446,11 @@
                 <div id="classes-list-container" class="space-y-5"></div>
             </div>
 
-            <!-- SHOP VIEW (CÓ MUA VÔ HẠN TIM 15 PHÚT 10000 VÀNG, X2 15 PHÚT 5000 VÀNG, X3 15 PHÚT 7500 VÀNG) -->
+            <!-- SHOP VIEW -->
             <div id="view-shop" class="hidden space-y-6">
                 <div class="bg-[#202f36] p-6 rounded-2xl border border-gray-800 text-center">
                     <h2 class="text-2xl font-black text-white mb-2"><i class="fa-solid fa-store text-yellow-400"></i> Cửa Hàng Vật Phẩm</h2>
-                    <p class="text-sm text-gray-400">Dùng xu vàng để kích hoạt Vô hạn trái tim, x2 XP hoặc x3 XP trong 15 phút, hoặc mua trợ giúp.</p>
+                    <p id="shop-subtitle" class="text-sm text-gray-400">Vật phẩm có thời hạn: đợi hết thời gian mới mua tiếp. Giáo viên được mua vô hạn lần.</p>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -465,7 +465,7 @@
                                 <span id="shop-inf-hearts-status" class="text-[11px] font-bold text-red-300"></span>
                             </div>
                         </div>
-                        <button onclick="buyTimedBoost('infHearts', 10000, 15)" class="btn-duolingo bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-extrabold px-4 py-2 rounded-xl text-sm flex items-center gap-1 shrink-0">
+                        <button id="btn-buy-infHearts" onclick="buyTimedBoost('infHearts', 10000, 15)" class="btn-duolingo bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-extrabold px-4 py-2 rounded-xl text-sm flex items-center gap-1 shrink-0">
                             <i class="fa-solid fa-coins"></i> 10000
                         </button>
                     </div>
@@ -481,7 +481,7 @@
                                 <span id="shop-xp2-status" class="text-[11px] font-bold text-purple-300"></span>
                             </div>
                         </div>
-                        <button onclick="buyTimedBoost('xp2', 5000, 15)" class="btn-duolingo bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-extrabold px-4 py-2 rounded-xl text-sm flex items-center gap-1 shrink-0">
+                        <button id="btn-buy-xp2" onclick="buyTimedBoost('xp2', 5000, 15)" class="btn-duolingo bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-extrabold px-4 py-2 rounded-xl text-sm flex items-center gap-1 shrink-0">
                             <i class="fa-solid fa-coins"></i> 5000
                         </button>
                     </div>
@@ -497,7 +497,7 @@
                                 <span id="shop-xp3-status" class="text-[11px] font-bold text-amber-300"></span>
                             </div>
                         </div>
-                        <button onclick="buyTimedBoost('xp3', 7500, 15)" class="btn-duolingo bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-extrabold px-4 py-2 rounded-xl text-sm flex items-center gap-1 shrink-0">
+                        <button id="btn-buy-xp3" onclick="buyTimedBoost('xp3', 7500, 15)" class="btn-duolingo bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-extrabold px-4 py-2 rounded-xl text-sm flex items-center gap-1 shrink-0">
                             <i class="fa-solid fa-coins"></i> 7500
                         </button>
                     </div>
@@ -526,10 +526,9 @@
                 </div>
             </div>
 
-            <!-- FRIENDS & FEED VIEW (THEO DÕI BẠN BÈ & BẢNG TIN TỰ ĐỘNG CHIA SẺ DANH HIỆU) -->
+            <!-- FRIENDS & FEED VIEW -->
             <div id="view-social" class="hidden space-y-6">
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                    <!-- Cột Theo dõi bạn bè -->
                     <div class="lg:col-span-5 game-card p-5 space-y-4">
                         <div>
                             <h2 class="text-lg font-black text-white flex items-center gap-2">
@@ -556,7 +555,6 @@
                         </div>
                     </div>
 
-                    <!-- Cột Bảng tin chia sẻ danh hiệu -->
                     <div class="lg:col-span-7 game-card p-5 space-y-4">
                         <div class="flex flex-wrap items-center justify-between gap-2">
                             <div>
@@ -637,9 +635,6 @@
             pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
         }
 
-        // =========================================================================
-        // CHUẨN HÓA EMAIL (1 GMAIL = 1 TÀI KHOẢN) & ĐĂNG NHẬP / ĐĂNG KÝ
-        // =========================================================================
         const USERS_STORAGE_KEY = 'english69_users_v1';
         const ACTIVE_USER_KEY = 'english69_active_user_v1';
         const CLASSES_STORAGE_KEY = 'english69_classes_v1';
@@ -846,7 +841,7 @@
             const mapSub = document.getElementById('map-subtitle');
             if (mapSub) {
                 mapSub.innerText = role === "Giáo viên"
-                    ? "Quyền Giáo viên: Đã mở khóa full đề tất cả Unit • Vô hạn xu vàng & tim"
+                    ? "Quyền Giáo viên: Full đề • Vô hạn xu, tim & mua vật phẩm vô hạn lần"
                     : "Hoàn thành đủ 4 chặng để mở khóa Unit tiếp theo";
             }
 
@@ -865,21 +860,28 @@
         }
 
         // =========================================================================
-        // VẬT PHẨM TĂNG CƯỜNG 15 PHÚT (VÔ HẠN TIM, X2 XP, X3 XP)
+        // VẬT PHẨM CÓ THỜI HẠN (ĐỢI HẾT GIỜ MỚI MUA TIẾP; GIÁO VIÊN MUA VÔ HẠN LẦN)
         // =========================================================================
+        function getBoostRemainingMs(type, now = Date.now()) {
+            const b = gameState.boosts || {};
+            if (type === 'infHearts') return Math.max(0, Number(b.infHeartsUntil || 0) - now);
+            if (type === 'xp2') return Math.max(0, Number(b.xp2Until || 0) - now);
+            if (type === 'xp3') return Math.max(0, Number(b.xp3Until || 0) - now);
+            return 0;
+        }
+
         function getActiveBoosts() {
             const now = Date.now();
-            const b = gameState.boosts || {};
-            const infHeartsUntil = Number(b.infHeartsUntil || 0);
-            const xp2Until = Number(b.xp2Until || 0);
-            const xp3Until = Number(b.xp3Until || 0);
+            const infHeartsRemainingMs = getBoostRemainingMs('infHearts', now);
+            const xp2RemainingMs = getBoostRemainingMs('xp2', now);
+            const xp3RemainingMs = getBoostRemainingMs('xp3', now);
 
             return {
-                hasInfHearts: isTeacherAccount() || infHeartsUntil > now,
-                infHeartsRemainingMs: Math.max(0, infHeartsUntil - now),
-                xp2RemainingMs: Math.max(0, xp2Until - now),
-                xp3RemainingMs: Math.max(0, xp3Until - now),
-                xpMultiplier: xp3Until > now ? 3 : (xp2Until > now ? 2 : 1)
+                hasInfHearts: isTeacherAccount() || infHeartsRemainingMs > 0,
+                infHeartsRemainingMs,
+                xp2RemainingMs,
+                xp3RemainingMs,
+                xpMultiplier: xp3RemainingMs > 0 ? 3 : (xp2RemainingMs > 0 ? 2 : 1)
             };
         }
 
@@ -890,35 +892,89 @@
             return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
         }
 
+        function syncTimedBoostButtonsUI() {
+            const teacherMode = isTeacherAccount();
+            const now = Date.now();
+            const items = [
+                { type: 'infHearts', cost: 10000, btnId: 'btn-buy-infHearts', statusId: 'shop-inf-hearts-status', activeLabel: '❤️ ∞' },
+                { type: 'xp2', cost: 5000, btnId: 'btn-buy-xp2', statusId: 'shop-xp2-status', activeLabel: '⚡ x2 XP' },
+                { type: 'xp3', cost: 7500, btnId: 'btn-buy-xp3', statusId: 'shop-xp3-status', activeLabel: '🔥 x3 XP' }
+            ];
+
+            const shopSub = document.getElementById('shop-subtitle');
+            if (shopSub) {
+                shopSub.innerText = teacherMode
+                    ? "Quyền Giáo viên: Có thể mua vật phẩm có thời hạn vô hạn lần bất kỳ lúc nào."
+                    : "Vật phẩm có thời hạn: phải đợi hết thời gian hiện tại mới có thể mua tiếp.";
+            }
+
+            items.forEach(it => {
+                const rem = getBoostRemainingMs(it.type, now);
+                const isRunning = rem > 0;
+                const btn = document.getElementById(it.btnId);
+                const statusEl = document.getElementById(it.statusId);
+
+                if (statusEl) {
+                    statusEl.innerText = isRunning
+                        ? `Đang hoạt động • Còn lại: ${formatRemaining(rem)}`
+                        : "Chưa kích hoạt (15 phút)";
+                }
+
+                if (btn) {
+                    if (!teacherMode && isRunning) {
+                        btn.disabled = true;
+                        btn.className = "btn-duolingo bg-gray-700 text-gray-300 font-extrabold px-3.5 py-2 rounded-xl text-xs cursor-not-allowed opacity-75 shrink-0";
+                        btn.innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Đợi hết giờ (${formatRemaining(rem)})`;
+                    } else {
+                        btn.disabled = false;
+                        btn.className = "btn-duolingo bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-extrabold px-4 py-2 rounded-xl text-sm flex items-center gap-1 shrink-0";
+                        btn.innerHTML = `<i class="fa-solid fa-coins"></i> ${it.cost}${teacherMode ? ' <span class="text-[10px] font-black">(∞)</span>' : ''}`;
+                    }
+                }
+            });
+        }
+
         function buyTimedBoost(type, cost, minutes) {
             const teacherMode = isTeacherAccount();
+            const remaining = getBoostRemainingMs(type);
+
+            if (!teacherMode && remaining > 0) {
+                alert(`⏳ Vật phẩm này đang có hiệu lực (còn ${formatRemaining(remaining)}). Hãy đợi hết thời gian mới mua tiếp!`);
+                syncTimedBoostButtonsUI();
+                return;
+            }
+
             if (!teacherMode && gameState.coins < cost) {
                 alert(`❌ Bạn không đủ ${cost} xu vàng để mua vật phẩm này!`);
                 return;
             }
+
             if (!teacherMode) {
                 gameState.coins -= cost;
             }
 
             gameState.boosts = gameState.boosts || {};
             const now = Date.now();
-            const durationMs = minutes * 60 * 1000;
+            const newUntil = now + minutes * 60 * 1000;
 
             if (type === 'infHearts') {
-                const base = Math.max(now, Number(gameState.boosts.infHeartsUntil || 0));
-                gameState.boosts.infHeartsUntil = base + durationMs;
+                gameState.boosts.infHeartsUntil = newUntil;
                 saveState();
-                alert(`❤️ Đã kích hoạt Vô hạn trái tim trong ${minutes} phút!`);
+                alert(teacherMode
+                    ? `❤️ Giáo viên đã kích hoạt Vô hạn trái tim (${minutes} phút) — mua vô hạn lần!`
+                    : `❤️ Đã kích hoạt Vô hạn trái tim trong ${minutes} phút!`);
             } else if (type === 'xp2') {
-                const base = Math.max(now, Number(gameState.boosts.xp2Until || 0));
-                gameState.boosts.xp2Until = base + durationMs;
+                gameState.boosts.xp2Until = newUntil;
                 saveState();
-                alert(`⚡ Đã kích hoạt x2 Kinh nghiệm trong ${minutes} phút!`);
+                alert(teacherMode
+                    ? `⚡ Giáo viên đã kích hoạt x2 Kinh nghiệm (${minutes} phút) — mua vô hạn lần!`
+                    : `⚡ Đã kích hoạt x2 Kinh nghiệm trong ${minutes} phút!`);
             } else if (type === 'xp3') {
-                const base = Math.max(now, Number(gameState.boosts.xp3Until || 0));
-                gameState.boosts.xp3Until = base + durationMs;
+                gameState.boosts.xp3Until = newUntil;
                 saveState();
-                alert(`🔥 Đã kích hoạt x3 Kinh nghiệm trong ${minutes} phút!`);
+                alert(teacherMode
+                    ? `🔥 Giáo viên đã kích hoạt x3 Kinh nghiệm (${minutes} phút) — mua vô hạn lần!`
+                    : `🔥 Đã kích hoạt x3 Kinh nghiệm trong ${minutes} phút!`);
             }
         }
 
@@ -1491,7 +1547,7 @@
 
             const timersBox = document.getElementById('hud-boost-timers');
             const badges = [];
-            if (!teacherMode && boosts.infHeartsRemainingMs > 0) {
+            if (boosts.infHeartsRemainingMs > 0) {
                 badges.push(`<span class="px-2 py-0.5 rounded-full bg-red-500/20 text-red-300 border border-red-500/40 text-[11px]">❤️ ∞ ${formatRemaining(boosts.infHeartsRemainingMs)}</span>`);
             }
             if (boosts.xp3RemainingMs > 0) {
@@ -1501,12 +1557,7 @@
             }
             timersBox.innerHTML = badges.join('');
 
-            const shopInf = document.getElementById('shop-inf-hearts-status');
-            const shopXp2 = document.getElementById('shop-xp2-status');
-            const shopXp3 = document.getElementById('shop-xp3-status');
-            if (shopInf) shopInf.innerText = teacherMode ? "Giáo viên: Đang bật vĩnh viễn" : (boosts.infHeartsRemainingMs > 0 ? `Còn lại: ${formatRemaining(boosts.infHeartsRemainingMs)}` : "");
-            if (shopXp2) shopXp2.innerText = boosts.xp2RemainingMs > 0 ? `Còn lại: ${formatRemaining(boosts.xp2RemainingMs)}` : "";
-            if (shopXp3) shopXp3.innerText = boosts.xp3RemainingMs > 0 ? `Còn lại: ${formatRemaining(boosts.xp3RemainingMs)}` : "";
+            syncTimedBoostButtonsUI();
         }
 
         setInterval(() => {
