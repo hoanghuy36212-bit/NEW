@@ -430,11 +430,11 @@
             <div id="view-classes" class="hidden space-y-6">
                 <div id="teacher-create-class-card" class="hidden game-card p-6 space-y-4">
                     <div>
-                        <span class="text-[11px] font-black uppercase text-purple-400">Quyền Giáo Viên (E69) • Vô Hạn Xu & Tim • Full Đề</span>
+                        <span id="class-role-banner" class="text-[11px] font-black uppercase text-purple-400">Quyền Giáo Viên / Admin • Vô Hạn Xu & Tim • Full Đề</span>
                         <h2 class="text-xl font-black text-white flex items-center gap-2 mt-0.5">
                             <i class="fa-solid fa-chalkboard-user text-purple-400"></i> Tạo Lớp Học Mới
                         </h2>
-                        <p class="text-xs text-gray-400 mt-1">Chỉ tài khoản Giáo viên mới có thể tạo lớp, thêm học sinh bằng <b>User ID</b>, tặng xu vàng và cài đặt thưởng xu khi hoàn thành bài.</p>
+                        <p class="text-xs text-gray-400 mt-1">Tài khoản Giáo viên và Admin có thể tạo lớp, thêm học sinh bằng <b>User ID</b>, tặng xu vàng và cài đặt thưởng xu khi hoàn thành bài.</p>
                     </div>
                     <div class="flex flex-col sm:flex-row gap-3">
                         <input type="text" id="new-class-name" placeholder="Tên lớp học (VD: Lớp 9A1 - Global Success)" class="flex-1 bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:border-purple-500 focus:outline-none">
@@ -450,7 +450,7 @@
             <div id="view-shop" class="hidden space-y-6">
                 <div class="bg-[#202f36] p-6 rounded-2xl border border-gray-800 text-center">
                     <h2 class="text-2xl font-black text-white mb-2"><i class="fa-solid fa-store text-yellow-400"></i> Cửa Hàng Vật Phẩm</h2>
-                    <p id="shop-subtitle" class="text-sm text-gray-400">Vật phẩm có thời hạn: đợi hết thời gian mới mua tiếp. Giáo viên được mua vô hạn lần.</p>
+                    <p id="shop-subtitle" class="text-sm text-gray-400">Vật phẩm có thời hạn: đợi hết thời gian mới mua tiếp. Giáo viên & Admin mua vô hạn lần.</p>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -524,6 +524,23 @@
                         <button onclick="buyShield()" class="btn-duolingo bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-extrabold px-4 py-2 rounded-xl text-sm flex items-center gap-1 shrink-0"><i class="fa-solid fa-coins"></i> 50</button>
                     </div>
                 </div>
+            </div>
+
+            <!-- LEADERBOARD & ADMIN BAN VIEW (BẢNG XẾP HẠNG TOÀN BỘ NGƯỜI DÙNG & QUYỀN BAN CỦA ADMIN) -->
+            <div id="view-leaderboard" class="hidden space-y-6">
+                <div class="bg-[#202f36] p-5 rounded-2xl border border-gray-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-xl font-black text-white flex items-center gap-2">
+                            <i class="fa-solid fa-ranking-star text-yellow-400"></i> Bảng Xếp Hạng Toàn Bộ Người Dùng
+                        </h2>
+                        <p id="leaderboard-subtitle" class="text-xs text-gray-400 mt-1">
+                            Xếp hạng toàn bộ tài khoản trên ứng dụng theo tổng XP và Cấp độ.
+                        </p>
+                    </div>
+                    <span id="leaderboard-total-badge" class="px-3 py-1 rounded-full bg-gray-800 text-xs font-extrabold text-cyan-300 self-start sm:self-auto">0 người dùng</span>
+                </div>
+
+                <div id="leaderboard-list" class="space-y-3"></div>
             </div>
 
             <!-- FRIENDS & FEED VIEW -->
@@ -618,11 +635,12 @@
 
         <!-- BOTTOM NAVIGATION -->
         <nav class="fixed bottom-0 left-0 right-0 bg-[#131f24]/95 backdrop-blur border-t border-gray-800 py-2 z-40">
-            <div class="max-w-2xl mx-auto flex justify-around">
+            <div class="max-w-3xl mx-auto flex justify-around">
                 <button onclick="switchTab('map')" id="nav-map" class="flex flex-col items-center text-emerald-400 transition"><i class="fa-solid fa-map text-lg"></i><span class="text-[11px] font-bold mt-1">Bản đồ</span></button>
                 <button onclick="switchTab('upload')" id="nav-upload" class="flex flex-col items-center text-gray-400 hover:text-gray-200 transition"><i class="fa-solid fa-layer-group text-lg"></i><span class="text-[11px] font-bold mt-1">Tạo Đề</span></button>
                 <button onclick="switchTab('classes')" id="nav-classes" class="flex flex-col items-center text-gray-400 hover:text-gray-200 transition"><i class="fa-solid fa-chalkboard text-lg"></i><span class="text-[11px] font-bold mt-1">Lớp học</span></button>
                 <button onclick="switchTab('shop')" id="nav-shop" class="flex flex-col items-center text-gray-400 hover:text-gray-200 transition"><i class="fa-solid fa-store text-lg"></i><span class="text-[11px] font-bold mt-1">Cửa hàng</span></button>
+                <button onclick="switchTab('leaderboard')" id="nav-leaderboard" class="flex flex-col items-center text-gray-400 hover:text-gray-200 transition"><i class="fa-solid fa-ranking-star text-lg"></i><span class="text-[11px] font-bold mt-1">Xếp hạng</span></button>
                 <button onclick="switchTab('social')" id="nav-social" class="flex flex-col items-center text-gray-400 hover:text-gray-200 transition"><i class="fa-solid fa-newspaper text-lg"></i><span class="text-[11px] font-bold mt-1">Bảng tin</span></button>
                 <button onclick="switchTab('badges')" id="nav-badges" class="flex flex-col items-center text-gray-400 hover:text-gray-200 transition"><i class="fa-solid fa-trophy text-lg"></i><span class="text-[11px] font-bold mt-1">Huy hiệu</span></button>
                 <button onclick="switchTab('profile')" id="nav-profile" class="flex flex-col items-center text-gray-400 hover:text-gray-200 transition"><i class="fa-solid fa-user text-lg"></i><span class="text-[11px] font-bold mt-1">Hồ sơ</span></button>
@@ -672,6 +690,7 @@
                 if (canonKey !== k) changed = true;
                 if (!u.userId) { u.userId = generateUserId(); changed = true; }
                 if (!u.role) { u.role = "Học sinh"; changed = true; }
+                if (typeof u.banned !== "boolean") { u.banned = false; changed = true; }
                 u.email = canonKey;
                 if (!normalizedMap[canonKey]) {
                     normalizedMap[canonKey] = u;
@@ -719,9 +738,14 @@
             return users[normalizeEmailKey(currentUserEmail)] || null;
         }
 
+        function isAdminAccount() {
+            const u = getCurrentUserInfo();
+            return Boolean(u && u.role === "Admin");
+        }
+
         function isTeacherAccount() {
             const u = getCurrentUserInfo();
-            return Boolean(u && u.role === "Giáo viên");
+            return Boolean(u && (u.role === "Giáo viên" || u.role === "Admin"));
         }
 
         function clearCodeError() {
@@ -775,11 +799,14 @@
 
             let role = "Học sinh";
             if (rawCode !== "") {
-                if (rawCode.toUpperCase() === "E69") {
+                const upperCode = rawCode.toUpperCase();
+                if (upperCode === "ADMIN") {
+                    role = "Admin";
+                } else if (upperCode === "E69") {
                     role = "Giáo viên";
                 } else {
                     codeInput.classList.add('code-error');
-                    codeErr.innerText = "Code không hợp lệ! Nhập E69 cho Giáo viên hoặc để trống cho Học sinh.";
+                    codeErr.innerText = "Code không hợp lệ! Nhập ADMIN, E69 hoặc để trống.";
                     codeInput.focus();
                     return;
                 }
@@ -792,7 +819,7 @@
             }
 
             const userId = generateUserId();
-            users[emailKey] = { userId, username, email: emailKey, password, role };
+            users[emailKey] = { userId, username, email: emailKey, password, role, banned: false, banReason: "" };
             saveUsersMap(users);
             enterMainApp(emailKey);
         }
@@ -808,6 +835,10 @@
                 msgEl.innerText = "Tài khoản chưa tồn tại trên trình duyệt này! Hãy bấm Sign up.";
                 return;
             }
+            if (users[emailKey].banned) {
+                msgEl.innerText = `⛔ Tài khoản này đã bị ADMIN ban! ${users[emailKey].banReason ? `Lý do: ${users[emailKey].banReason}` : ""}`;
+                return;
+            }
             if (users[emailKey].password !== password) {
                 msgEl.innerText = "Sai mật khẩu! Vui lòng kiểm tra lại.";
                 return;
@@ -818,36 +849,55 @@
 
         function enterMainApp(email) {
             const canonEmail = normalizeEmailKey(email);
+            const users = getUsersMap();
+            const userInfo = users[canonEmail];
+
+            if (!userInfo || userInfo.banned) {
+                logoutUser();
+                return;
+            }
+
             currentUserEmail = canonEmail;
             localStorage.setItem(ACTIVE_USER_KEY, canonEmail);
             document.getElementById('auth-screen').style.display = 'none';
             document.getElementById('app-shell').classList.remove('hidden');
 
-            const users = getUsersMap();
-            const userInfo = users[canonEmail] || { userId: generateUserId(), username: "Học Sinh Chăm Chỉ", email: canonEmail, role: "Học sinh" };
             const role = userInfo.role || "Học sinh";
+            const isAdm = role === "Admin";
+            const isTch = role === "Giáo viên" || isAdm;
 
             gameState = loadUserGameState(canonEmail);
             document.getElementById('hud-user-label').innerText = `${userInfo.username} (${role}) • ${userInfo.userId}`;
             document.getElementById('prof-username').innerText = userInfo.username;
             document.getElementById('prof-userid').innerText = userInfo.userId;
-            document.getElementById('prof-role-badge').innerText = role;
-            document.getElementById('prof-role-badge').className = role === "Giáo viên"
-                ? "inline-block mt-1 px-3 py-0.5 rounded-full text-xs font-extrabold bg-purple-500/20 text-purple-300"
-                : "inline-block mt-1 px-3 py-0.5 rounded-full text-xs font-extrabold bg-emerald-500/20 text-emerald-300";
+
+            const badgeEl = document.getElementById('prof-role-badge');
+            badgeEl.innerText = role;
+            if (isAdm) {
+                badgeEl.className = "inline-block mt-1 px-3 py-0.5 rounded-full text-xs font-extrabold bg-rose-500/20 text-rose-300";
+                document.getElementById('prof-avatar').innerText = "ADM";
+            } else if (isTch) {
+                badgeEl.className = "inline-block mt-1 px-3 py-0.5 rounded-full text-xs font-extrabold bg-purple-500/20 text-purple-300";
+                document.getElementById('prof-avatar').innerText = "GV";
+            } else {
+                badgeEl.className = "inline-block mt-1 px-3 py-0.5 rounded-full text-xs font-extrabold bg-emerald-500/20 text-emerald-300";
+                document.getElementById('prof-avatar').innerText = (userInfo.username || "E69").slice(0, 3).toUpperCase();
+            }
             document.getElementById('prof-email').innerText = canonEmail;
-            document.getElementById('prof-avatar').innerText = role === "Giáo viên" ? "GV" : (userInfo.username || "E69").slice(0, 3).toUpperCase();
 
             const mapSub = document.getElementById('map-subtitle');
             if (mapSub) {
-                mapSub.innerText = role === "Giáo viên"
-                    ? "Quyền Giáo viên: Full đề • Vô hạn xu, tim & mua vật phẩm vô hạn lần"
-                    : "Hoàn thành đủ 4 chặng để mở khóa Unit tiếp theo";
+                mapSub.innerText = isAdm
+                    ? "Quyền ADMIN: Full đề • Vô hạn xu, tim & ban mọi tài khoản"
+                    : (isTch
+                        ? "Quyền Giáo viên: Full đề • Vô hạn xu, tim & mua vật phẩm vô hạn lần"
+                        : "Hoàn thành đủ 4 chặng để mở khóa Unit tiếp theo");
             }
 
             switchGrade(gameState.currentGrade || 9);
             updateHUD();
             renderClassesView();
+            renderLeaderboardView();
             renderSocialView();
         }
 
@@ -860,7 +910,133 @@
         }
 
         // =========================================================================
-        // VẬT PHẨM CÓ THỜI HẠN (ĐỢI HẾT GIỜ MỚI MUA TIẾP; GIÁO VIÊN MUA VÔ HẠN LẦN)
+        // BẢNG XẾP HẠNG TOÀN BỘ NGƯỜI DÙNG & QUYỀN BAN CỦA ADMIN
+        // =========================================================================
+        function toggleBanUser(targetEmailKey) {
+            if (!isAdminAccount()) {
+                alert("❌ Chỉ tài khoản ADMIN mới có quyền ban / gỡ ban tài khoản!");
+                return;
+            }
+            const canonTarget = normalizeEmailKey(targetEmailKey);
+            if (canonTarget === normalizeEmailKey(currentUserEmail)) {
+                alert("⚠️ Bạn không thể tự ban tài khoản ADMIN của chính mình!");
+                return;
+            }
+
+            const users = getUsersMap();
+            const target = users[canonTarget];
+            if (!target) {
+                alert("❌ Không tìm thấy người dùng!");
+                return;
+            }
+
+            if (target.banned) {
+                target.banned = false;
+                target.banReason = "";
+                saveUsersMap(users);
+                renderLeaderboardView();
+                alert(`✅ Đã gỡ ban tài khoản ${target.username} (${target.userId}).`);
+            } else {
+                const reason = prompt(`Nhập lý do ban tài khoản ${target.username} (${target.role} • ${target.userId}):`, "Vi phạm quy định ứng dụng");
+                if (reason === null) return;
+                target.banned = true;
+                target.banReason = reason.trim() || "Vi phạm quy định ứng dụng";
+                saveUsersMap(users);
+
+                if (normalizeEmailKey(localStorage.getItem(ACTIVE_USER_KEY) || "") === canonTarget) {
+                    logoutUser();
+                }
+                renderLeaderboardView();
+                alert(`⛔ Đã ban tài khoản ${target.username} (${target.role} • ${target.userId})!`);
+            }
+        }
+
+        function renderLeaderboardView() {
+            const listEl = document.getElementById('leaderboard-list');
+            const totalBadge = document.getElementById('leaderboard-total-badge');
+            const subEl = document.getElementById('leaderboard-subtitle');
+            if (!listEl) return;
+
+            const users = getUsersMap();
+            const isAdm = isAdminAccount();
+
+            if (subEl) {
+                subEl.innerText = isAdm
+                    ? "Quyền ADMIN: Xem toàn bộ người dùng và ban/gỡ ban bất kỳ tài khoản nào (kể cả Giáo viên)."
+                    : "Xếp hạng toàn bộ tài khoản trên ứng dụng theo tổng XP và Cấp độ.";
+            }
+
+            const rows = Object.entries(users).map(([emailKey, u]) => {
+                const st = loadUserGameState(emailKey);
+                return {
+                    emailKey,
+                    userId: u.userId || "---",
+                    username: u.username || "Người dùng",
+                    role: u.role || "Học sinh",
+                    banned: Boolean(u.banned),
+                    banReason: u.banReason || "",
+                    xp: Number(st.xp || 0),
+                    level: Number(st.level || 1)
+                };
+            }).sort((a, b) => (b.xp - a.xp) || (b.level - a.level));
+
+            if (totalBadge) {
+                totalBadge.innerText = `${rows.length} người dùng`;
+            }
+
+            if (rows.length === 0) {
+                listEl.innerHTML = `<div class="game-card p-6 text-center text-xs text-gray-400">Chưa có người dùng nào trên hệ thống.</div>`;
+                return;
+            }
+
+            listEl.innerHTML = rows.map((r, idx) => {
+                const rank = idx + 1;
+                const rankColor = rank === 1
+                    ? "bg-yellow-500 text-gray-950"
+                    : (rank === 2 ? "bg-slate-300 text-gray-950" : (rank === 3 ? "bg-amber-700 text-white" : "bg-gray-800 text-gray-300"));
+
+                const rolePill = r.role === "Admin"
+                    ? `<span class="px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-rose-500/20 text-rose-300">Admin</span>`
+                    : (r.role === "Giáo viên"
+                        ? `<span class="px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-purple-500/20 text-purple-300">Giáo viên</span>`
+                        : `<span class="px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-500/20 text-emerald-300">Học sinh</span>`);
+
+                const banBadge = r.banned
+                    ? `<span class="px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-red-600/30 text-red-300 border border-red-500/40">⛔ Đã ban</span>`
+                    : "";
+
+                const isSelf = r.emailKey === normalizeEmailKey(currentUserEmail);
+                const banBtnHtml = (isAdm && !isSelf)
+                    ? `<button onclick="toggleBanUser('${r.emailKey}')" class="btn-duolingo ${r.banned ? 'bg-emerald-600 hover:bg-emerald-500 text-white' : 'bg-red-600 hover:bg-red-500 text-white'} font-black px-3 py-1.5 rounded-xl text-xs shrink-0">
+                        ${r.banned ? '<i class="fa-solid fa-unlock"></i> Gỡ ban' : '<i class="fa-solid fa-ban"></i> Ban'}
+                    </button>`
+                    : "";
+
+                return `
+                    <div class="game-card p-4 flex flex-wrap items-center justify-between gap-3 ${r.banned ? 'opacity-70 border-red-500/40' : ''}">
+                        <div class="flex items-center gap-3">
+                            <span class="w-9 h-9 rounded-xl ${rankColor} flex items-center justify-center font-black text-sm shrink-0">#${rank}</span>
+                            <div>
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <span class="text-sm font-black text-white">${r.username}</span>
+                                    <span class="text-xs text-cyan-400 font-mono font-bold">${r.userId}</span>
+                                    ${rolePill}
+                                    ${banBadge}
+                                </div>
+                                <p class="text-xs text-gray-400 mt-0.5">
+                                    Lv.${r.level} • <b class="text-yellow-400">${r.xp} XP</b>
+                                    ${r.banned && r.banReason ? ` • <span class="text-red-300">Lý do: ${r.banReason}</span>` : ""}
+                                </p>
+                            </div>
+                        </div>
+                        ${banBtnHtml}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // =========================================================================
+        // VẬT PHẨM CÓ THỜI HẠN (ĐỢI HẾT GIỜ MỚI MUA TIẾP; GIÁO VIÊN & ADMIN MUA VÔ HẠN LẦN)
         // =========================================================================
         function getBoostRemainingMs(type, now = Date.now()) {
             const b = gameState.boosts || {};
@@ -896,15 +1072,15 @@
             const teacherMode = isTeacherAccount();
             const now = Date.now();
             const items = [
-                { type: 'infHearts', cost: 10000, btnId: 'btn-buy-infHearts', statusId: 'shop-inf-hearts-status', activeLabel: '❤️ ∞' },
-                { type: 'xp2', cost: 5000, btnId: 'btn-buy-xp2', statusId: 'shop-xp2-status', activeLabel: '⚡ x2 XP' },
-                { type: 'xp3', cost: 7500, btnId: 'btn-buy-xp3', statusId: 'shop-xp3-status', activeLabel: '🔥 x3 XP' }
+                { type: 'infHearts', cost: 10000, btnId: 'btn-buy-infHearts', statusId: 'shop-inf-hearts-status' },
+                { type: 'xp2', cost: 5000, btnId: 'btn-buy-xp2', statusId: 'shop-xp2-status' },
+                { type: 'xp3', cost: 7500, btnId: 'btn-buy-xp3', statusId: 'shop-xp3-status' }
             ];
 
             const shopSub = document.getElementById('shop-subtitle');
             if (shopSub) {
                 shopSub.innerText = teacherMode
-                    ? "Quyền Giáo viên: Có thể mua vật phẩm có thời hạn vô hạn lần bất kỳ lúc nào."
+                    ? "Quyền Giáo viên & Admin: Có thể mua vật phẩm có thời hạn vô hạn lần bất kỳ lúc nào."
                     : "Vật phẩm có thời hạn: phải đợi hết thời gian hiện tại mới có thể mua tiếp.";
             }
 
@@ -955,26 +1131,15 @@
 
             gameState.boosts = gameState.boosts || {};
             const now = Date.now();
-            const newUntil = now + minutes * 60 * 1000;
+            gameState.boosts[`${type}Until`] = now + minutes * 60 * 1000;
+            saveState();
 
             if (type === 'infHearts') {
-                gameState.boosts.infHeartsUntil = newUntil;
-                saveState();
-                alert(teacherMode
-                    ? `❤️ Giáo viên đã kích hoạt Vô hạn trái tim (${minutes} phút) — mua vô hạn lần!`
-                    : `❤️ Đã kích hoạt Vô hạn trái tim trong ${minutes} phút!`);
+                alert(`❤️ Đã kích hoạt Vô hạn trái tim trong ${minutes} phút!`);
             } else if (type === 'xp2') {
-                gameState.boosts.xp2Until = newUntil;
-                saveState();
-                alert(teacherMode
-                    ? `⚡ Giáo viên đã kích hoạt x2 Kinh nghiệm (${minutes} phút) — mua vô hạn lần!`
-                    : `⚡ Đã kích hoạt x2 Kinh nghiệm trong ${minutes} phút!`);
+                alert(`⚡ Đã kích hoạt x2 Kinh nghiệm trong ${minutes} phút!`);
             } else if (type === 'xp3') {
-                gameState.boosts.xp3Until = newUntil;
-                saveState();
-                alert(teacherMode
-                    ? `🔥 Giáo viên đã kích hoạt x3 Kinh nghiệm (${minutes} phút) — mua vô hạn lần!`
-                    : `🔥 Đã kích hoạt x3 Kinh nghiệm trong ${minutes} phút!`);
+                alert(`🔥 Đã kích hoạt x3 Kinh nghiệm trong ${minutes} phút!`);
             }
         }
 
@@ -1132,7 +1297,7 @@
         // QUẢN LÝ LỚP HỌC, TẶNG XU & SETUP THƯỞNG XU KHI HOÀN THÀNH BÀI
         // =========================================================================
         function createNewClass() {
-            if (!isTeacherAccount()) { alert("❌ Chỉ tài khoản Giáo viên mới có thể tạo lớp học!"); return; }
+            if (!isTeacherAccount()) { alert("❌ Chỉ tài khoản Giáo viên hoặc Admin mới có thể tạo lớp học!"); return; }
             const user = getCurrentUserInfo();
             const nameInput = document.getElementById('new-class-name');
             const className = nameInput.value.trim();
@@ -1181,7 +1346,7 @@
         }
 
         function giftCoinsToStudent(classId) {
-            if (!isTeacherAccount()) { alert("❌ Chỉ tài khoản Giáo viên mới có thể tặng xu vàng!"); return; }
+            if (!isTeacherAccount()) { alert("❌ Chỉ tài khoản Giáo viên hoặc Admin mới có thể tặng xu vàng!"); return; }
             const selectEl = document.getElementById(`gift-student-select-${classId}`);
             const amountEl = document.getElementById(`gift-coins-amount-${classId}`);
             const studentUserId = (selectEl && selectEl.value) ? selectEl.value.trim().toUpperCase() : "";
@@ -1201,11 +1366,11 @@
 
             amountEl.value = "";
             renderClassesView();
-            alert(`🪙 Giáo viên đã tặng ${amount} xu vàng cho ${studentInfo.username} (${studentInfo.userId})!`);
+            alert(`🪙 Đã tặng ${amount} xu vàng cho ${studentInfo.username} (${studentInfo.userId})!`);
         }
 
         function assignWorkToClass(classId) {
-            if (!isTeacherAccount()) { alert("❌ Chỉ tài khoản Giáo viên mới có thể giao bài!"); return; }
+            if (!isTeacherAccount()) { alert("❌ Chỉ tài khoản Giáo viên hoặc Admin mới có thể giao bài!"); return; }
             const selectCustom = document.getElementById(`assign-custom-select-${classId}`);
             const titleEl = document.getElementById(`assign-title-${classId}`);
             const rewardEl = document.getElementById(`assign-reward-${classId}`);
@@ -1307,7 +1472,7 @@
             currentUnitObj = {
                 id: asn.id,
                 title: `${cls.name} • ${asn.title}`,
-                vietnamese: `Bài giao bởi GV ${cls.teacherName} • Thưởng ${asn.rewardCoins || 0} xu`,
+                vietnamese: `Bài giao bởi ${cls.teacherName} • Thưởng ${asn.rewardCoins || 0} xu`,
                 vocab: [],
                 grammar: { title: asn.title, content: `Bài tập lớp ${cls.name}` },
                 quiz: asn.quiz,
@@ -1329,12 +1494,12 @@
             const users = getUsersMap();
             const allClasses = getClassesList();
 
-            const isTeacher = user.role === "Giáo viên";
-            if (isTeacher) createCard.classList.remove('hidden');
+            const canManageClasses = user.role === "Giáo viên" || user.role === "Admin";
+            if (canManageClasses) createCard.classList.remove('hidden');
             else createCard.classList.add('hidden');
 
-            const visibleClasses = isTeacher
-                ? allClasses.filter(c => normalizeEmailKey(c.teacherEmail) === normalizeEmailKey(user.email))
+            const visibleClasses = canManageClasses
+                ? (user.role === "Admin" ? allClasses : allClasses.filter(c => normalizeEmailKey(c.teacherEmail) === normalizeEmailKey(user.email)))
                 : allClasses.filter(c => (c.studentIds || []).includes(user.userId));
 
             listContainer.innerHTML = "";
@@ -1343,8 +1508,8 @@
                 listContainer.innerHTML = `
                     <div class="game-card p-8 text-center space-y-2">
                         <i class="fa-solid fa-users-slash text-3xl text-gray-500"></i>
-                        <h3 class="text-base font-black text-white">${isTeacher ? "Bạn chưa tạo lớp học nào" : "Bạn chưa được thêm vào lớp học nào"}</h3>
-                        <p class="text-xs text-gray-400">${isTeacher ? "Nhập tên lớp ở khung phía trên để tạo lớp đầu tiên." : `Hãy gửi User ID của bạn (${user.userId}) cho giáo viên để được thêm vào lớp.`}</p>
+                        <h3 class="text-base font-black text-white">${canManageClasses ? "Bạn chưa tạo lớp học nào" : "Bạn chưa được thêm vào lớp học nào"}</h3>
+                        <p class="text-xs text-gray-400">${canManageClasses ? "Nhập tên lớp ở khung phía trên để tạo lớp đầu tiên." : `Hãy gửi User ID của bạn (${user.userId}) cho giáo viên để được thêm vào lớp.`}</p>
                     </div>`;
                 return;
             }
@@ -1381,7 +1546,7 @@
                     return `<option value="${sid}">${st ? st.username : "Học sinh"} (${sid})</option>`;
                 }).join('');
 
-                const teacherControlsHtml = isTeacher ? `
+                const teacherControlsHtml = canManageClasses ? `
                     <div class="pt-3 border-t border-gray-800 space-y-4">
                         <div class="space-y-1.5">
                             <label class="block text-xs font-extrabold text-cyan-300"><i class="fa-solid fa-user-plus"></i> Thêm học sinh bằng User ID:</label>
@@ -1392,7 +1557,7 @@
                         </div>
 
                         <div class="bg-yellow-950/20 border border-yellow-500/30 rounded-xl p-3.5 space-y-2">
-                            <label class="block text-xs font-extrabold text-yellow-300"><i class="fa-solid fa-coins"></i> Tặng xu vàng cho học sinh (Vô hạn xu giáo viên):</label>
+                            <label class="block text-xs font-extrabold text-yellow-300"><i class="fa-solid fa-coins"></i> Tặng xu vàng cho học sinh:</label>
                             <div class="flex flex-col sm:flex-row gap-2">
                                 <select id="gift-student-select-${cls.id}" class="flex-1 bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:border-yellow-400 focus:outline-none"><option value="">-- Chọn học sinh --</option>${studentSelectOptions}</select>
                                 <input type="number" id="gift-coins-amount-${cls.id}" min="1" placeholder="Số xu tặng" class="w-full sm:w-32 bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white font-mono focus:border-yellow-400 focus:outline-none">
@@ -2020,7 +2185,7 @@ D. leave`;
         }
 
         function switchTab(tab) {
-            ['map', 'upload', 'classes', 'shop', 'social', 'badges', 'profile'].forEach(t => {
+            ['map', 'upload', 'classes', 'shop', 'leaderboard', 'social', 'badges', 'profile'].forEach(t => {
                 const viewEl = t === 'map' ? document.getElementById('view-map-wrapper') : document.getElementById(`view-${t}`);
                 const navEl = document.getElementById(`nav-${t}`);
                 if (viewEl) viewEl.classList.add('hidden');
@@ -2034,6 +2199,7 @@ D. leave`;
 
             if (tab === 'classes') renderClassesView();
             if (tab === 'shop') updateHUD();
+            if (tab === 'leaderboard') renderLeaderboardView();
             if (tab === 'social') renderSocialView();
             if (tab === 'badges') renderBadges();
             if (tab === 'profile') updateProfileStats();
@@ -2320,7 +2486,7 @@ D. leave`;
                     <div>
                         <h2 class="text-2xl font-black text-white">Hoàn Thành Xuất Sắc Chặng Này!</h2>
                         <p class="text-sm text-emerald-400 mt-1">${currentUnitObj.title}</p>
-                        <p class="text-xs text-gray-400 mt-2">+${earnedXp} XP ${teacherMode ? "| Giáo viên: Vô hạn xu & tim" : "| +10 Vàng"} ${bonusText}${sharedNotice}</p>
+                        <p class="text-xs text-gray-400 mt-2">+${earnedXp} XP ${teacherMode ? "| Vô hạn xu & tim" : "| +10 Vàng"} ${bonusText}${sharedNotice}</p>
                     </div>
                     <button onclick="closeLesson()" class="btn-duolingo w-full max-w-sm mx-auto bg-emerald-600 text-white font-black py-4 rounded-2xl text-lg">Hoàn thành ✔</button>
                 </div>`;
