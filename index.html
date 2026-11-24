@@ -182,7 +182,7 @@
                         <i class="fa-solid fa-fire"></i> <span id="streak-count">0</span>
                     </div>
                     <div class="flex items-center gap-1 text-yellow-400" title="Xu vàng">
-                        <i class="fa-solid fa-coins"></i> <span id="coins-count">1000</span>
+                        <i class="fa-solid fa-coins"></i> <span id="coins-count">60</span>
                     </div>
                     <div class="flex items-center gap-1 text-red-500" title="Trái tim">
                         <i class="fa-solid fa-heart"></i> <span id="hearts-count">10</span>
@@ -345,7 +345,7 @@
                             </div>
                         </div>
                         <button onclick="buyHearts()" class="btn-duolingo bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-extrabold px-4 py-2 rounded-xl text-sm flex items-center gap-1">
-                            <i class="fa-solid fa-coins"></i> 2500
+                            <i class="fa-solid fa-coins"></i> 30
                         </button>
                     </div>
 
@@ -358,7 +358,7 @@
                             </div>
                         </div>
                         <button onclick="buyShield()" class="btn-duolingo bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-extrabold px-4 py-2 rounded-xl text-sm flex items-center gap-1">
-                            <i class="fa-solid fa-coins"></i> 500
+                            <i class="fa-solid fa-coins"></i> 50
                         </button>
                     </div>
 
@@ -1803,32 +1803,141 @@
             });
         }
 
-        const generateUnits = (gradeName, titles) => {
-            return titles.map((titleData, i) => ({
-                id: i + 1,
-                title: `Unit ${i + 1}: ${titleData.en}`,
-                vietnamese: titleData.vi,
-                semester: i < 6 ? 1 : 2,
-                vocab: [
-                    { en: "school", vi: "trường học", phonetic: "/skuːl/", example: "My school is large." },
-                    { en: "student", vi: "học sinh", phonetic: "/ˈstjuːdnt/", example: "Students study hard." },
-                    { en: "teacher", vi: "giáo viên", phonetic: "/ˈtiːtʃə(r)/", example: "Our teacher is helpful." },
-                    { en: "friend", vi: "bạn bè", phonetic: "/frend/", example: "Make new friends." }
-                ],
-                grammar: { title: `Ngữ pháp trọng tâm Unit ${i + 1}`, content: `Hệ thống cấu trúc ngữ pháp quan trọng trong chương trình ${gradeName} Global Success.` },
+        // =============================================================
+        // ===== DỮ LIỆU CÂU HỎI THEO 8 CHỦ ĐỀ (khớp file đề + đáp án) =====
+        // =============================================================
+        const TOPIC_QUIZ_DATA = {
+            1: {
                 quiz: [
-                    { q: `Chọn dạng đúng của động từ: She _____ to school every day.`, options: ["go", "goes", "going", "is go"], correctText: "goes" },
-                    { q: `Chọn từ loại phù hợp: My brother is very _____ and helpful.`, options: ["kind", "lazily", "slow", "noise"], correctText: "kind" },
-                    { q: `Chọn giới từ đúng: There is a picture _____ the wall.`, options: ["in", "at", "on", "under"], correctText: "on" },
-                    { q: `Chọn đáp án đúng điền vào chỗ trống: They _____ English at the moment.`, options: ["study", "studies", "are studying", "studied"], correctText: "are studying" },
-                    { q: `Chọn cấu trúc so sánh đúng: This house is _____ than that one.`, options: ["big", "bigger", "biggest", "more big"], correctText: "bigger" }
+                    { q: "Mai usually ______ to school by bike, but today she ______ on foot with her new friend.", options: ["goes - is walking", "is going - walks", "go - walk", "went - walked"], correctText: "goes - is walking" },
+                    { q: "The school festival is ______ November and the opening ceremony is ______ Friday morning.", options: ["on - in", "in - on", "at - on", "in - at"], correctText: "in - on" },
+                    { q: "Linh wants to join the art club, ______ she doesn't have enough free time.", options: ["so", "but", "because", "or"], correctText: "but" },
+                    { q: "Staying up late to play video games ______ make you feel tired the next morning.", options: ["should", "might", "must", "need"], correctText: "might" },
+                    { q: "______ she tried her best on the project, she still asked her teacher for feedback.", options: ["Because", "Although", "So", "If"], correctText: "Although" }
                 ],
                 sentences: [
-                    { scrambled: ["English", "learn", "We", "today"], correct: "We learn English today." },
-                    { scrambled: ["school", "to", "go", "Students"], correct: "Students go to school." }
+                    { scrambled: ["badminton", "We", "class", "after", "often", "play", "schoolyard", "in", "the"], correct: "We often play badminton in the schoolyard after class." },
+                    { scrambled: ["sleep", "teens", "alert", "If", "night", "will", "eight", "stay", "hours", "a", "they"], correct: "If teens sleep eight hours a night, they will stay alert." }
+                ]
+            },
+            2: {
+                quiz: [
+                    { q: "This is ______ bedroom, and there is a small lamp ______ the desk.", options: ["Minh's - on", "Minh - in", "Minh's - in", "Minh - on"], correctText: "Minh's - on" },
+                    { q: "The air in the countryside is much ______ than in the city.", options: ["fresh", "fresher", "more fresh", "freshest"], correctText: "fresher" },
+                    { q: "The ______ the city becomes, the ______ the traffic is.", options: ["more crowded - worse", "most crowded - worst", "crowdeder - badder", "more crowded - worst"], correctText: "more crowded - worse" },
+                    { q: "The supermarket ______ at 9 p.m. every day.", options: ["close", "closes", "is closing", "closed"], correctText: "closes" },
+                    { q: "The local government decided to ______ a survey about traffic in the city.", options: ["carry out", "take off", "put on", "look after"], correctText: "carry out" }
                 ],
-                boss: { name: `Trùm Unit ${i + 1}`, hp: 100, questions: 5 }
-            }));
+                sentences: [
+                    { scrambled: ["grows", "The", "expensive", "city", "more", "faster", "becomes", "the", "housing", "the"], correct: "The faster the city grows, the more expensive housing becomes." },
+                    { scrambled: ["bakery", "The", "bank", "is", "and", "the", "bookshop", "between", "the"], correct: "The bookshop is between the bakery and the bank." }
+                ]
+            },
+            3: {
+                quiz: [
+                    { q: "My sister is keen on ______ stamps and ______ models.", options: ["collecting - making", "collect - make", "to collect - to make", "collected - made"], correctText: "collecting - making" },
+                    { q: "This film is not ______ as the one we watched last week.", options: ["as exciting", "as bright", "more exciting", "exciting"], correctText: "as bright" },
+                    { q: "The football match was really ______; all the fans were cheering loudly.", options: ["excited", "excitement", "exciting", "excite"], correctText: "exciting" },
+                    { q: "My mother suggested ______ a cake for my birthday.", options: ["make", "making", "to make", "made"], correctText: "making" },
+                    { q: "______ the instructions carefully before you start the test.", options: ["Reading", "Read", "To read", "Reads"], correctText: "Read" }
+                ],
+                sentences: [
+                    { scrambled: ["listening", "TV", "prefer", "to", "I", "watching", "music", "to"], correct: "I prefer listening to music to watching TV." },
+                    { scrambled: ["championship", "ago", "won", "They", "years", "two", "the"], correct: "They won the championship two years ago." }
+                ]
+            },
+            4: {
+                quiz: [
+                    { q: "There isn't ______ milk in the fridge, so we need to buy ______.", options: ["some - any", "any - some", "any - any", "some - some"], correctText: "any - some" },
+                    { q: "You ______ drink cold water when you have a sore throat.", options: ["should", "shouldn't", "must", "can"], correctText: "shouldn't" },
+                    { q: "If you eat too much fast food, you ______ gain weight.", options: ["will", "would", "won't", "didn't"], correctText: "will" },
+                    { q: "My father enjoys ______ green tea every morning.", options: ["drink", "drinking", "to drink", "drank"], correctText: "drinking" }
+                ],
+                sentences: [
+                    { scrambled: ["enough", "We", "day", "drink", "should", "water", "every"], correct: "We should drink enough water every day." },
+                    { scrambled: ["wash", "he", "stomachache", "If", "have", "does", "a", "not", "may", "fruit", "he", "the"], correct: "If he does not wash the fruit, he may have a stomachache." }
+                ]
+            },
+            5: {
+                quiz: [
+                    { q: "Last month, our class ______ old books and clothes for poor children.", options: ["collect", "collected", "collecting", "collects"], correctText: "collected" },
+                    { q: "Vietnamese people often visit their relatives ______ Tet.", options: ["in", "on", "at", "Ø (no article)"], correctText: "Ø (no article)" },
+                    { q: "I wish I ______ more time to visit the ancient pagoda.", options: ["have", "had", "will have", "having"], correctText: "had" },
+                    { q: "______ do people make the traditional conical hat? - By hand.", options: ["What", "How", "Why", "Where"], correctText: "How" }
+                ],
+                sentences: [
+                    { scrambled: ["family", "People", "Year", "the", "first", "gather", "Lunar", "of", "day", "New", "with", "their", "on", "the"], correct: "People gather with their family on the first day of the Lunar New Year." },
+                    { scrambled: ["could", "She", "again", "wishes", "visit", "pagoda", "she", "ancient", "the"], correct: "She wishes she could visit the ancient pagoda again." }
+                ]
+            },
+            6: {
+                quiz: [
+                    { q: "My sister ______ to Ha Long Bay twice.", options: ["visits", "visited", "has visited", "is visiting"], correctText: "has visited" },
+                    { q: "The teacher ______ us whether we had finished our project.", options: ["asked", "said", "told", "spoke"], correctText: "asked" },
+                    { q: "The tour guide ______ showed us around the old town was very friendly.", options: ["who", "which", "whom", "whose"], correctText: "who" },
+                    { q: "______ Thames is ______ longest river in England.", options: ["The - the", "A - the", "The - a", "A - a"], correctText: "The - the" }
+                ],
+                sentences: [
+                    { scrambled: ["several", "They", "Singapore", "to", "times", "have", "traveled"], correct: "They have traveled to Singapore several times." },
+                    { scrambled: ["city", "This", "lives", "where", "is", "cousin", "my", "the"], correct: "This is the city where my cousin lives." }
+                ]
+            },
+            7: {
+                quiz: [
+                    { q: "If we ______ using plastic bags, we will protect the environment.", options: ["stop", "stopped", "will stop", "stopping"], correctText: "stop" },
+                    { q: "While I ______ dinner, the phone rang.", options: ["have", "was having", "had", "am having"], correctText: "was having" },
+                    { q: "Remember to turn off the lights ______ you leave the room.", options: ["before", "after", "while", "until"], correctText: "before" },
+                    { q: "Solar power, ______ is a renewable energy source, is becoming popular.", options: ["which", "that", "who", "where"], correctText: "which" }
+                ],
+                sentences: [
+                    { scrambled: ["electricity", "off", "should", "lights", "We", "save", "unnecessary", "by", "turning"], correct: "We should save electricity by turning off unnecessary lights." },
+                    { scrambled: ["cut", "happen", "will", "people", "more", "If", "trees", "often", "down", "floods"], correct: "If people cut down trees, floods will happen more often." }
+                ]
+            },
+            8: {
+                quiz: [
+                    { q: "In the future, robots ______ help doctors in hospitals.", options: ["might", "must", "should", "need"], correctText: "might" },
+                    { q: "This smartphone is ______, not mine.", options: ["her", "hers", "she", "herself"], correctText: "hers" },
+                    { q: "The scientist said that he ______ a new test next week.", options: ["will test", "would test", "tests", "tested"], correctText: "would test" },
+                    { q: "She asked me ______ I liked learning about space.", options: ["if", "that", "what", "which"], correctText: "if" }
+                ],
+                sentences: [
+                    { scrambled: ["voice", "houses", "will", "smart", "Future", "control", "have"], correct: "Future houses will have smart voice control." },
+                    { scrambled: ["loved", "said", "space", "She", "learning", "she", "about", "that"], correct: "She said that she loved learning about space." }
+                ]
+            }
+        };
+
+        const UNIT_TOPIC_MAP = {
+            "Lớp 6": { 1:1, 2:2, 3:1, 4:2, 5:6, 6:4, 7:3, 8:3, 9:6, 10:2, 11:7, 12:3 },
+            "Lớp 7": { 1:3, 2:4, 3:5, 4:3, 5:4, 6:1, 7:6, 8:3, 9:5, 10:7, 11:6, 12:6 },
+            "Lớp 8": { 1:3, 2:2, 3:1, 4:5, 5:5, 6:4, 7:7, 8:2, 9:7, 10:8, 11:8, 12:7 },
+            "Lớp 9": { 1:5, 2:2, 3:1, 4:5, 5:6, 6:2, 7:6, 8:6, 9:6, 10:7, 11:8, 12:1 }
+        };
+
+        const generateUnits = (gradeName, titles) => {
+            const topicMap = UNIT_TOPIC_MAP[gradeName] || {};
+            return titles.map((titleData, i) => {
+                const unitNum = i + 1;
+                const topicNum = topicMap[unitNum] || 1;
+                const topicData = TOPIC_QUIZ_DATA[topicNum];
+                return {
+                    id: unitNum,
+                    title: `Unit ${unitNum}: ${titleData.en}`,
+                    vietnamese: titleData.vi,
+                    semester: i < 6 ? 1 : 2,
+                    vocab: [
+                        { en: "school", vi: "trường học", phonetic: "/skuːl/", example: "My school is large." },
+                        { en: "student", vi: "học sinh", phonetic: "/ˈstjuːdnt/", example: "Students study hard." },
+                        { en: "teacher", vi: "giáo viên", phonetic: "/ˈtiːtʃə(r)/", example: "Our teacher is helpful." },
+                        { en: "friend", vi: "bạn bè", phonetic: "/frend/", example: "Make new friends." }
+                    ],
+                    grammar: { title: `Ngữ pháp trọng tâm Unit ${unitNum}`, content: `Hệ thống cấu trúc ngữ pháp quan trọng trong chương trình ${gradeName} Global Success.` },
+                    quiz: topicData.quiz,
+                    sentences: topicData.sentences,
+                    boss: { name: `Trùm Unit ${unitNum}`, hp: 100, questions: topicData.quiz.length }
+                };
+            });
         };
 
         const titles6 = [
@@ -1898,6 +2007,10 @@
             }
             updateHUD();
         }
+
+        function updateHUD() {
+            const teacherMode = isTeacherAccount();
+            const boosts = getActiveBoosts();
 
         function updateHUD() {
             const teacherMode = isTeacherAccount();
