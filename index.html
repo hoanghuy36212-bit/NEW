@@ -388,7 +388,7 @@
                         </button>
                     </div>
 
-                    <div class="game-card p-5 flex items-center justify-between gap-3 sm:col-span-2">
+                    <div class="game-card p-5 flex items-center justify-between gap-3">
                         <div class="flex items-center gap-3.5">
                             <div class="w-14 h-14 bg-amber-500/20 text-amber-400 rounded-2xl flex items-center justify-center text-2xl shrink-0"><i class="fa-solid fa-fire-flame-curved"></i></div>
                             <div>
@@ -398,6 +398,19 @@
                         </div>
                         <button id="btn-buy-xp3" onclick="buyTimedBoost('xp3', 7500, 15)" class="btn-duolingo bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-extrabold px-4 py-2 rounded-xl text-sm flex items-center gap-1 shrink-0">
                             <i class="fa-solid fa-coins"></i> 7500
+                        </button>
+                    </div>
+
+                    <div class="game-card p-5 flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-3.5">
+                            <div class="w-14 h-14 bg-cyan-500/20 text-cyan-400 rounded-2xl flex items-center justify-center text-2xl shrink-0"><i class="fa-solid fa-rocket"></i></div>
+                            <div>
+                                <h3 class="font-bold text-white text-base">x5 Kinh Nghiệm (15 Phút)</h3>
+                                <p id="shop-xp5-status" class="text-[11px] text-cyan-300 font-bold mt-0.5">Chưa kích hoạt</p>
+                            </div>
+                        </div>
+                        <button id="btn-buy-xp5" onclick="buyTimedBoost('xp5', 12500, 15)" class="btn-duolingo bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-extrabold px-4 py-2 rounded-xl text-sm flex items-center gap-1 shrink-0">
+                            <i class="fa-solid fa-coins"></i> 12500
                         </button>
                     </div>
                 </div>
@@ -1234,6 +1247,7 @@
             if (type === 'infHearts') return Math.max(0, Number(b.infHeartsUntil || 0) - now);
             if (type === 'xp2') return Math.max(0, Number(b.xp2Until || 0) - now);
             if (type === 'xp3') return Math.max(0, Number(b.xp3Until || 0) - now);
+            if (type === 'xp5') return Math.max(0, Number(b.xp5Until || 0) - now);
             return 0;
         }
 
@@ -1242,13 +1256,15 @@
             const infHeartsRemainingMs = getBoostRemainingMs('infHearts', now);
             const xp2RemainingMs = getBoostRemainingMs('xp2', now);
             const xp3RemainingMs = getBoostRemainingMs('xp3', now);
+            const xp5RemainingMs = getBoostRemainingMs('xp5', now);
 
             return {
                 hasInfHearts: isTeacherAccount() || infHeartsRemainingMs > 0,
                 infHeartsRemainingMs,
                 xp2RemainingMs,
                 xp3RemainingMs,
-                xpMultiplier: xp3RemainingMs > 0 ? 3 : (xp2RemainingMs > 0 ? 2 : 1)
+                xp5RemainingMs,
+                xpMultiplier: xp5RemainingMs > 0 ? 5 : (xp3RemainingMs > 0 ? 3 : (xp2RemainingMs > 0 ? 2 : 1))
             };
         }
 
@@ -1265,7 +1281,8 @@
             const items = [
                 { type: 'infHearts', cost: 10000, btnId: 'btn-buy-infHearts', statusId: 'shop-inf-hearts-status' },
                 { type: 'xp2', cost: 5000, btnId: 'btn-buy-xp2', statusId: 'shop-xp2-status' },
-                { type: 'xp3', cost: 7500, btnId: 'btn-buy-xp3', statusId: 'shop-xp3-status' }
+                { type: 'xp3', cost: 7500, btnId: 'btn-buy-xp3', statusId: 'shop-xp3-status' },
+                { type: 'xp5', cost: 12500, btnId: 'btn-buy-xp5', statusId: 'shop-xp5-status' }
             ];
 
             const shopSub = document.getElementById('shop-subtitle');
@@ -1341,6 +1358,8 @@
                 alert(`⚡ Đã kích hoạt x2 Kinh nghiệm!${modeNote}`);
             } else if (type === 'xp3') {
                 alert(`🔥 Đã kích hoạt x3 Kinh nghiệm!${modeNote}`);
+            } else if (type === 'xp5') {
+                alert(`🚀 Đã kích hoạt x5 Kinh nghiệm!${modeNote}`);
             }
         }
 
@@ -1984,7 +2003,7 @@
                 completedUnits: { 6: [], 7: [], 8: [], 9: [], custom: [] },
                 customUnits: [],
                 sharedBadges: [],
-                boosts: { infHeartsUntil: 0, xp2Until: 0, xp3Until: 0 },
+                boosts: { infHeartsUntil: 0, xp2Until: 0, xp3Until: 0, xp5Until: 0 },
                 audioEnabled: true
             };
         }
@@ -2036,7 +2055,9 @@
             if (boosts.infHeartsRemainingMs > 0) {
                 badges.push(`<span class="px-2 py-0.5 rounded-full bg-red-500/20 text-red-300 border border-red-500/40 text-[11px]">❤️ ∞ ${formatRemaining(boosts.infHeartsRemainingMs)}</span>`);
             }
-            if (boosts.xp3RemainingMs > 0) {
+            if (boosts.xp5RemainingMs > 0) {
+                badges.push(`<span class="px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 text-[11px]">🚀 x5 XP ${formatRemaining(boosts.xp5RemainingMs)}</span>`);
+            } else if (boosts.xp3RemainingMs > 0) {
                 badges.push(`<span class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[11px]">🔥 x3 XP ${formatRemaining(boosts.xp3RemainingMs)}</span>`);
             } else if (boosts.xp2RemainingMs > 0) {
                 badges.push(`<span class="px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/40 text-[11px]">⚡ x2 XP ${formatRemaining(boosts.xp2RemainingMs)}</span>`);
