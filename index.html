@@ -179,7 +179,7 @@
                 <div class="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm font-extrabold flex-wrap justify-end">
                     <div id="hud-boost-timers" class="flex items-center gap-1.5 flex-wrap"></div>
                     <div class="flex items-center gap-1 text-orange-400" title="Chuỗi ngày học">
-                        <i class="fa-solid fa-fire"></i> <span id="streak-count">1</span>
+                        <i class="fa-solid fa-fire"></i> <span id="streak-count">0</span>
                     </div>
                     <div class="flex items-center gap-1 text-yellow-400" title="Xu vàng">
                         <i class="fa-solid fa-coins"></i> <span id="coins-count">60</span>
@@ -481,7 +481,7 @@
                     <div class="grid grid-cols-3 gap-3 pt-4 border-t border-gray-800 text-center">
                         <div class="bg-gray-800/50 p-3 rounded-xl"><span id="prof-score" class="block text-xl font-black text-yellow-400">0</span><span class="text-xs text-gray-400">Tổng XP</span></div>
                         <div class="bg-gray-800/50 p-3 rounded-xl"><span id="prof-hearts" class="block text-xl font-black text-red-500">10</span><span class="text-xs text-gray-400">Tim hiện tại</span></div>
-                        <div class="bg-gray-800/50 p-3 rounded-xl"><span id="prof-streak" class="block text-xl font-black text-orange-400">1</span><span class="text-xs text-gray-400">Chuỗi ngày</span></div>
+                        <div class="bg-gray-800/50 p-3 rounded-xl"><span id="prof-streak" class="block text-xl font-black text-orange-400">0</span><span class="text-xs text-gray-400">Chuỗi ngày</span></div>
                     </div>
 
                     <div class="bg-gray-900/70 border border-cyan-500/30 rounded-2xl p-4 text-left space-y-2.5">
@@ -919,6 +919,7 @@
 
             gameState = loadUserGameState(canonEmail);
             gameState.level = computeLevelFromXp(gameState.xp);
+            checkStreakOnLoad();
 
             document.getElementById('hud-user-label').innerText = `${userInfo.username} (${role}) • ${userInfo.userId}`;
             document.getElementById('prof-username').innerText = userInfo.username;
@@ -1870,7 +1871,7 @@
 
         function createDefaultState() {
             return {
-                currentGrade: 9, level: 1, xp: 0, streak: 1, coins: 60, hearts: 10, maxHearts: 10, shield: false,
+                currentGrade: 9, level: 1, xp: 0, streak: 0, lastStudyDate: null, coins: 60, hearts: 10, maxHearts: 10, shield: false,
                 completedUnits: { 6: [], 7: [], 8: [], 9: [], custom: [] },
                 customUnits: [],
                 sharedBadges: [],
@@ -2626,6 +2627,53 @@ D. leave`;
             }
         }
 
+        function getLocalDateKey(dateObj = new Date()) {
+            const y = dateObj.getFullYear();
+            const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const d = String(dateObj.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+
+        function updateLearningStreak() {
+            const todayKey = getLocalDateKey(new Date());
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            const yesterdayKey = getLocalDateKey(yesterday);
+
+            const lastDate = gameState.lastStudyDate || null;
+            if (!lastDate) {
+                gameState.streak = Math.max(1, Number(gameState.streak || 0) + 1);
+                gameState.lastStudyDate = todayKey;
+                return "increased";
+            }
+            if (lastDate === todayKey) {
+                if (!gameState.streak || gameState.streak < 1) {
+                    gameState.streak = 1;
+                    return "increased";
+                }
+                return "unchanged";
+            }
+            if (lastDate === yesterdayKey) {
+                gameState.streak = Number(gameState.streak || 0) + 1;
+                gameState.lastStudyDate = todayKey;
+                return "increased";
+            }
+            gameState.streak = 1;
+            gameState.lastStudyDate = todayKey;
+            return "reset";
+        }
+
+        function checkStreakOnLoad() {
+            if (!gameState.lastStudyDate) return;
+            const todayKey = getLocalDateKey(new Date());
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            const yesterdayKey = getLocalDateKey(yesterday);
+            if (gameState.lastStudyDate !== todayKey && gameState.lastStudyDate !== yesterdayKey) {
+                gameState.streak = 0;
+            }
+        }
+
         function finishStageReward() {
             const teacherMode = isTeacherAccount();
             const boosts = getActiveBoosts();
@@ -2676,6 +2724,13 @@ D. leave`;
                     autoShareBadgeToFeed(badgeName, `Đã chinh phục thành công ${currentUnitObj.title}!`);
                     sharedNotice = `<br><span class='text-cyan-300 font-bold'>📰 Đã tự động chia sẻ "${badgeName}" lên Bảng tin!</span>`;
                 }
+            }
+
+            const streakStatus = updateLearningStreak();
+            if (streakStatus === "increased") {
+                bonusText += `<br><span class='text-orange-400 font-bold'>🔥 Chuỗi ngày học tăng lên ${gameState.streak} ngày!</span>`;
+            } else if (streakStatus === "reset") {
+                bonusText += `<br><span class='text-orange-300 font-bold'>🔥 Bắt đầu lại chuỗi ngày học: ${gameState.streak} ngày!</span>`;
             }
 
             saveState(); confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
